@@ -5,9 +5,22 @@ Aplicación JetCobot organizada por pestañas.
 
   - "Control y Movimiento": todo lo de jetcobot_gui_posiciones.py
     (conexión, motores, articulaciones, gripper, posiciones guardadas).
-  - "Detección de Color": abre la cámara del robot (/dev/video0 por
-    defecto) y detecta un color (por preset o por rango HSV manual),
-    mostrando el video en vivo con el resultado superpuesto.
+  - "Detección de Color": detecta un color en la cámara (por preset o por
+    rango HSV manual), mostrando el video en vivo con el resultado
+    superpuesto.
+  - "Calibración": perfiles de pieza (color + diámetro real + si debe tener
+    hueco visible) y calibración de cámara (offset físico cámara→gripper y
+    distancia focal), para calcular en vivo la distancia real a una pieza
+    y cuánto le falta bajar al gripper para alcanzarla.
+
+La cámara (/dev/video0 por defecto) se controla en una sola barra
+compartida arriba de las pestañas, porque un dispositivo V4L2 no se puede
+abrir dos veces a la vez.
+
+Carpetas:
+    panels/  paneles de la interfaz (control, posiciones, calibración)
+    vision/  cámara compartida y funciones de visión por color/forma
+    data/    perfiles, posiciones y calibraciones guardadas (JSON)
 
 Uso:
     python3 jetcobot_app.py
@@ -16,79 +29,27 @@ Requiere:
     pip install pymycobot opencv-python pillow
 """
 
-import threading
-import time
+import sys
 import tkinter as tk
+from pathlib import Path
 from tkinter import ttk
 
 import cv2
 from PIL import Image, ImageTk
 
+_ROOT = Path(__file__).resolve().parent
+sys.path.insert(0, str(_ROOT / "panels"))
+sys.path.insert(0, str(_ROOT / "vision"))
+
+from calibracion_panel import CalibracionPanel
+from camera_stream import COLOR_PRESETS, DEFAULT_CAMERA, CameraStream
 from jetcobot_gui_posiciones import PosicionesPanel
-
-DEFAULT_CAMERA = "/dev/video0"
-FRAME_WIDTH, FRAME_HEIGHT = 640, 480
-
-# Rangos HSV de referencia (OpenCV: H 0-179, S/V 0-255). El rojo se define
-# con dos bandas porque el tono envuelve el 0/179.
-COLOR_PRESETS = {
-    "Rojo": [((0, 120, 70), (10, 255, 255)), ((170, 120, 70), (180, 255, 255))],
-    "Verde": [((36, 60, 60), (89, 255, 255))],
-    "Azul": [((94, 80, 40), (126, 255, 255))],
-    "Amarillo": [((20, 100, 100), (35, 255, 255))],
-}
-
-
-class CameraStream:
-    """Lee frames de la cámara en un hilo aparte para no bloquear la GUI."""
-
-    def __init__(self, device):
-        self.device = device
-        self.cap = None
-        self.lock = threading.Lock()
-        self.latest_frame = None
-        self._running = False
-        self._thread = None
-
-    def start(self):
-        self.cap = cv2.VideoCapture(self.device, cv2.CAP_V4L2)
-        self.cap.set(cv2.CAP_PROP_FRAME_WIDTH, FRAME_WIDTH)
-        self.cap.set(cv2.CAP_PROP_FRAME_HEIGHT, FRAME_HEIGHT)
-        if not self.cap.isOpened():
-            self.cap.release()
-            self.cap = None
-            raise RuntimeError(f"No se pudo abrir {self.device}")
-        self._running = True
-        self._thread = threading.Thread(target=self._loop, daemon=True)
-        self._thread.start()
-
-    def _loop(self):
-        while self._running:
-            ok, frame = self.cap.read()
-            if ok:
-                with self.lock:
-                    self.latest_frame = frame
-            else:
-                time.sleep(0.05)
-
-    def get_frame(self):
-        with self.lock:
-            return None if self.latest_frame is None else self.latest_frame.copy()
-
-    def stop(self):
-        self._running = False
-        if self._thread is not None:
-            self._thread.join(timeout=1.0)
-            self._thread = None
-        if self.cap is not None:
-            self.cap.release()
-            self.cap = None
 
 
 class ColorDetectionPanel(ttk.Frame):
-    def __init__(self, master, **kwargs):
+    def __init__(self, master, camera, **kwargs):
         super().__init__(master, **kwargs)
-        self.stream = None
+        self.camera = camera
         self.active_ranges = None
         self.active_color_name = tk.StringVar(value="Ninguno")
 
@@ -100,10 +61,10 @@ class ColorDetectionPanel(ttk.Frame):
         self.s_min, self.s_max = tk.IntVar(value=100), tk.IntVar(value=255)
         self.v_min, self.v_max = tk.IntVar(value=100), tk.IntVar(value=255)
 
-        self.status_var = tk.StringVar(value="Cámara detenida.")
         self.detection_var = tk.StringVar(value="Sin detección")
 
         self._build_ui()
+        self._update_frame()
 
     # ------------------------------------------------------------------
     def _build_ui(self):
@@ -120,24 +81,14 @@ class ColorDetectionPanel(ttk.Frame):
         controls = ttk.Frame(self)
         controls.grid(row=0, column=1, sticky="n", **pad)
 
-        cam_frame = ttk.LabelFrame(controls, text="Conexión de cámara")
-        cam_frame.pack(fill="x", **pad)
-        ttk.Label(cam_frame, text="Dispositivo:").grid(row=0, column=0, **pad)
-        self.device_entry = ttk.Entry(cam_frame, width=14)
-        self.device_entry.insert(0, DEFAULT_CAMERA)
-        self.device_entry.grid(row=0, column=1, **pad)
-        self.start_btn = ttk.Button(cam_frame, text="Iniciar", command=self._on_start_camera)
-        self.start_btn.grid(row=0, column=2, **pad)
-        self.stop_btn = ttk.Button(cam_frame, text="Detener", command=self._on_stop_camera, state="disabled")
-        self.stop_btn.grid(row=0, column=3, **pad)
-        ttk.Label(cam_frame, textvariable=self.status_var).grid(row=1, column=0, columnspan=4, sticky="w", **pad)
-
         preset_frame = ttk.LabelFrame(controls, text="Color a detectar (preset)")
         preset_frame.pack(fill="x", **pad)
         for i, name in enumerate(COLOR_PRESETS):
-            ttk.Button(preset_frame, text=name, command=lambda n=name: self._on_preset(n)).grid(row=0, column=i, **pad)
-        ttk.Label(preset_frame, text="Activo:").grid(row=1, column=0, **pad)
-        ttk.Label(preset_frame, textvariable=self.active_color_name).grid(row=1, column=1, columnspan=3, sticky="w", **pad)
+            ttk.Button(preset_frame, text=name, command=lambda n=name: self._on_preset(n)).grid(
+                row=i // 3, column=i % 3, **pad
+            )
+        ttk.Label(preset_frame, text="Activo:").grid(row=2, column=0, **pad)
+        ttk.Label(preset_frame, textvariable=self.active_color_name).grid(row=2, column=1, columnspan=2, sticky="w", **pad)
 
         manual_frame = ttk.LabelFrame(controls, text="Rango HSV manual")
         manual_frame.pack(fill="x", **pad)
@@ -182,34 +133,9 @@ class ColorDetectionPanel(ttk.Frame):
         )]
         self.active_color_name.set("Manual")
 
-    def _on_start_camera(self):
-        device = self.device_entry.get().strip()
-        try:
-            stream = CameraStream(device)
-            stream.start()
-        except Exception as exc:
-            self.status_var.set(f"Error: {exc}")
-            return
-        self.stream = stream
-        self.status_var.set(f"Cámara activa: {device}")
-        self.start_btn.configure(state="disabled")
-        self.stop_btn.configure(state="normal")
-        self._update_frame()
-
-    def _on_stop_camera(self):
-        if self.stream is not None:
-            self.stream.stop()
-            self.stream = None
-        self.video_label.configure(image="", text="Cámara apagada")
-        self.status_var.set("Cámara detenida.")
-        self.start_btn.configure(state="normal")
-        self.stop_btn.configure(state="disabled")
-
     # ------------------------------------------------------------------
     def _update_frame(self):
-        if self.stream is None:
-            return
-        frame = self.stream.get_frame()
+        frame = self.camera.get_frame() if self.camera.running else None
         if frame is not None:
             if self.detect_var.get() and self.active_ranges:
                 display, info = self._detect_color(frame)
@@ -218,6 +144,8 @@ class ColorDetectionPanel(ttk.Frame):
                 display = frame
                 self.detection_var.set("Detección desactivada")
             self._render(display)
+        else:
+            self.video_label.configure(image="", text="Cámara apagada")
         self.after(30, self._update_frame)
 
     def _detect_color(self, frame):
@@ -252,30 +180,71 @@ class ColorDetectionPanel(ttk.Frame):
 
     # ------------------------------------------------------------------
     def shutdown(self):
-        if self.stream is not None:
-            self.stream.stop()
-            self.stream = None
+        pass
 
 
 class JetcobotApp(tk.Tk):
     def __init__(self):
         super().__init__()
         self.title("JetCobot - Panel de control")
+        self.geometry("1250x850")
+
+        self.camera = CameraStream()
+        self._build_camera_bar()
 
         notebook = ttk.Notebook(self)
         notebook.pack(fill="both", expand=True)
 
         self.control_panel = PosicionesPanel(notebook)
-        self.color_panel = ColorDetectionPanel(notebook)
+        self.color_panel = ColorDetectionPanel(notebook, self.camera)
+        self.calib_panel = CalibracionPanel(notebook, self.camera, self.control_panel.robot)
 
         notebook.add(self.control_panel, text="Control y Movimiento")
         notebook.add(self.color_panel, text="Detección de Color")
+        notebook.add(self.calib_panel, text="Calibración")
 
         self.protocol("WM_DELETE_WINDOW", self._on_close)
+
+    def _build_camera_bar(self):
+        pad = {"padx": 6, "pady": 4}
+        bar = ttk.LabelFrame(self, text="Cámara (compartida entre pestañas)")
+        bar.pack(fill="x", **pad)
+
+        ttk.Label(bar, text="Dispositivo:").grid(row=0, column=0, **pad)
+        self.device_entry = ttk.Entry(bar, width=14)
+        self.device_entry.insert(0, DEFAULT_CAMERA)
+        self.device_entry.grid(row=0, column=1, **pad)
+
+        self.start_btn = ttk.Button(bar, text="Iniciar cámara", command=self._on_start_camera)
+        self.start_btn.grid(row=0, column=2, **pad)
+        self.stop_btn = ttk.Button(bar, text="Detener cámara", command=self._on_stop_camera, state="disabled")
+        self.stop_btn.grid(row=0, column=3, **pad)
+
+        self.camera_status_var = tk.StringVar(value="Cámara detenida.")
+        ttk.Label(bar, textvariable=self.camera_status_var).grid(row=0, column=4, **pad)
+
+    def _on_start_camera(self):
+        device = self.device_entry.get().strip()
+        try:
+            self.camera.start(device)
+        except Exception as exc:
+            self.camera_status_var.set(f"Error: {exc}")
+            return
+        self.camera_status_var.set(f"Cámara activa: {device}")
+        self.start_btn.configure(state="disabled")
+        self.stop_btn.configure(state="normal")
+
+    def _on_stop_camera(self):
+        self.camera.stop()
+        self.camera_status_var.set("Cámara detenida.")
+        self.start_btn.configure(state="normal")
+        self.stop_btn.configure(state="disabled")
 
     def _on_close(self):
         self.control_panel.shutdown()
         self.color_panel.shutdown()
+        self.calib_panel.shutdown()
+        self.camera.stop()
         self.destroy()
 
 

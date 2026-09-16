@@ -4,7 +4,7 @@
 Interfaz de escritorio basica para el control del JetCobot (MyCobot280).
 
 Uso:
-    python3 jetcobot_gui.py
+    python3 panels/jetcobot_gui.py
 
 Requiere:
     pip install pymycobot
@@ -26,10 +26,62 @@ ANGLE_MIN = [-168, -135, -150, -145, -165, -180]
 ANGLE_MAX = [168, 90, 150, 145, 165, 180]
 HOME_ANGLES = [0, 0, 0, 0, 0, 45]
 
+# Ejes de coordenadas cartesianas para el jog por cinemática inversa
+# (mismo orden/ids que pymycobot.genre.Coord: X,Y,Z,Rx,Ry,Rz).
+CART_AXIS_NAMES = ["X", "Y", "Z", "R", "P", "Yaw"]
+
 GRIPPER_MIN = 0
 GRIPPER_MAX = 100
 
 POLL_INTERVAL = 0.7  # segundos entre lecturas de estado del robot
+
+
+class ScrollableFrame(ttk.Frame):
+    """Frame con scroll vertical (rueda del mouse) para contenido que no
+    entra en la altura de la pantalla. Los widgets van dentro de
+    `.interior`, no directamente dentro de la instancia."""
+
+    def __init__(self, master, **kwargs):
+        super().__init__(master, **kwargs)
+        canvas = tk.Canvas(self, highlightthickness=0)
+        scrollbar = ttk.Scrollbar(self, orient="vertical", command=canvas.yview)
+        canvas.configure(yscrollcommand=scrollbar.set)
+        canvas.pack(side="left", fill="both", expand=True)
+        scrollbar.pack(side="right", fill="y")
+
+        self.interior = ttk.Frame(canvas)
+        window_id = canvas.create_window((0, 0), window=self.interior, anchor="nw")
+
+        def _actualizar_scrollregion(_event=None):
+            canvas.configure(scrollregion=canvas.bbox("all"))
+
+        def _ajustar_ancho(event):
+            canvas.itemconfigure(window_id, width=event.width)
+
+        self.interior.bind("<Configure>", _actualizar_scrollregion)
+        canvas.bind("<Configure>", _ajustar_ancho)
+
+        def _on_mousewheel(event):
+            if getattr(event, "num", None) == 4:
+                canvas.yview_scroll(-1, "units")
+            elif getattr(event, "num", None) == 5:
+                canvas.yview_scroll(1, "units")
+            elif getattr(event, "delta", 0):
+                canvas.yview_scroll(int(-1 * (event.delta / 120)), "units")
+
+        def _activar_scroll(_event=None):
+            canvas.bind_all("<MouseWheel>", _on_mousewheel)
+            canvas.bind_all("<Button-4>", _on_mousewheel)
+            canvas.bind_all("<Button-5>", _on_mousewheel)
+
+        def _desactivar_scroll(_event=None):
+            canvas.unbind_all("<MouseWheel>")
+            canvas.unbind_all("<Button-4>")
+            canvas.unbind_all("<Button-5>")
+
+        canvas.bind("<Enter>", _activar_scroll)
+        canvas.bind("<Leave>", _desactivar_scroll)
+        self.canvas = canvas
 
 
 class RobotController:
@@ -48,6 +100,15 @@ class RobotController:
             mc = MyCobot280(port, baud)
             # Fuerza una lectura para confirmar que el robot responde de verdad.
             mc.get_angles()
+            # Fuerza el sistema de referencia a "base" (0). Si quedara en
+            # "herramienta" (1), los movimientos en X/Y/Z se interpretan
+            # relativos a la orientación actual del gripper en vez de a los
+            # ejes reales de la base — eso da movimientos que parecen
+            # erráticos aunque el comando esté bien armado.
+            try:
+                mc.set_reference_frame(0)
+            except Exception:
+                pass
             self.mc = mc
 
     def disconnect(self):
@@ -65,17 +126,57 @@ class RobotController:
         with self.lock:
             return fn(*args, **kwargs)
 
+    def _call_lista(self, fn, largo_esperado, reintentos=5):
+        """Como _call, pero valida la forma de la respuesta.
+
+        La librería pymycobot a veces responde con -1 (u otro entero) en vez
+        de la lista esperada cuando el bus serie está ocupado o el robot
+        sigue en movimiento. -1 es "verdadero" en Python, así que un simple
+        `if resultado:` no lo filtra — hay que revisar el tipo explícitamente.
+        El sondeo automático (cada POLL_INTERVAL) puede dejar el bus ocupado
+        justo cuando se pide una lectura puntual (p.ej. para el jog
+        cartesiano), así que se reintenta con más paciencia que antes.
+        Devuelve None si, tras reintentar, no se obtiene una lista válida.
+        """
+        for _ in range(reintentos):
+            resultado = self._call(fn)
+            if isinstance(resultado, (list, tuple)) and len(resultado) == largo_esperado:
+                return list(resultado)
+            time.sleep(0.3)
+        return None
+
     def get_angles(self):
-        return self._call(self.mc.get_angles)
+        return self._call_lista(self.mc.get_angles, 6)
 
     def get_coords(self):
-        return self._call(self.mc.get_coords)
+        return self._call_lista(self.mc.get_coords, 6)
 
     def get_gripper_value(self):
-        return self._call(self.mc.get_gripper_value)
+        resultado = self._call(self.mc.get_gripper_value)
+        if isinstance(resultado, (int, float)) and resultado >= 0:
+            return resultado
+        return None
 
     def jog_joint(self, joint_id, step_deg, speed):
         self._call(self.mc.jog_increment_angle, joint_id, step_deg, speed)
+
+    def jog_coord_axis(self, axis_id, step, speed):
+        """Mueve el gripper un paso en una coordenada cartesiana (1=X,2=Y,3=Z,4=R,5=P,6=Yaw).
+
+        El firmware de este brazo no responde de forma fiable a los
+        comandos de un solo eje (jog_increment_coord, send_coord) — se
+        comprobó con diagnostico/control_movimiento.py que ninguno de los
+        dos mueve el robot, aunque no devuelvan error. Solo el envío del
+        vector de 6 coordenadas completo (send_coords) funciona, así que
+        este método lee la posición actual y reenvía ese vector completo
+        con el eje pedido modificado — el robot resuelve la cinemática
+        inversa internamente igual, solo que por ese camino.
+        """
+        coords = self.get_coords()
+        if coords is None:
+            raise RuntimeError("No se pudo leer la posición actual del robot para calcular el movimiento.")
+        coords[axis_id - 1] += step
+        self._call(self.mc.send_coords, coords, speed)
 
     def send_angles(self, angles, speed):
         self._call(self.mc.send_angles, angles, speed)
@@ -102,6 +203,17 @@ class RobotController:
     def stop(self):
         self._call(self.mc.stop)
 
+    def resume(self):
+        self._call(self.mc.resume)
+
+    def get_reference_frame(self):
+        """0 = base (esperado), 1 = herramienta. None si no se pudo leer."""
+        resultado = self._call(self.mc.get_reference_frame)
+        return resultado if resultado in (0, 1) else None
+
+    def set_reference_frame_base(self):
+        self._call(self.mc.set_reference_frame, 0)
+
 
 class JetcobotControlPanel(ttk.Frame):
     """Panel con conexión, motores, articulaciones y gripper.
@@ -122,11 +234,17 @@ class JetcobotControlPanel(ttk.Frame):
 
         self.speed_var = tk.IntVar(value=50)
         self.step_var = tk.IntVar(value=5)
+        self.cart_step_var = tk.IntVar(value=5)
         self.gripper_step_var = tk.IntVar(value=10)
 
         self.angle_labels = []
         self.gripper_label_var = tk.StringVar(value="--")
         self.coords_label_var = tk.StringVar(value="--")
+        self.ref_frame_var = tk.StringVar(value="Referencia: --")
+
+        self._scroll = ScrollableFrame(self)
+        self._scroll.pack(fill="both", expand=True)
+        self.content = self._scroll.interior
 
         self._build_ui()
         self._set_controls_enabled(False)
@@ -142,7 +260,7 @@ class JetcobotControlPanel(ttk.Frame):
     def _build_ui(self):
         pad = {"padx": 6, "pady": 4}
 
-        conn_frame = ttk.LabelFrame(self, text="Conexión")
+        conn_frame = ttk.LabelFrame(self.content, text="Conexión")
         conn_frame.grid(row=0, column=0, columnspan=2, sticky="ew", **pad)
 
         ttk.Label(conn_frame, text="Puerto:").grid(row=0, column=0, **pad)
@@ -163,7 +281,7 @@ class JetcobotControlPanel(ttk.Frame):
         self.status_label = ttk.Label(conn_frame, text="● Desconectado", foreground="red")
         self.status_label.grid(row=0, column=6, **pad)
 
-        power_frame = ttk.LabelFrame(self, text="Motores")
+        power_frame = ttk.LabelFrame(self.content, text="Motores")
         power_frame.grid(row=1, column=0, columnspan=2, sticky="ew", **pad)
 
         self.power_on_btn = ttk.Button(power_frame, text="Power ON", command=self._on_power_on)
@@ -183,7 +301,19 @@ class JetcobotControlPanel(ttk.Frame):
         )
         self.stop_btn.grid(row=0, column=5, **pad)
 
-        speed_frame = ttk.LabelFrame(self, text="Parámetros de movimiento")
+        self.resume_btn = tk.Button(
+            power_frame, text="Reanudar", command=self._on_resume,
+            bg="#27ae60", fg="white", activebackground="#2ecc71", activeforeground="white",
+        )
+        self.resume_btn.grid(row=0, column=6, **pad)
+
+        ttk.Label(power_frame, textvariable=self.ref_frame_var).grid(row=1, column=0, columnspan=3, sticky="w", **pad)
+        self.fix_ref_btn = ttk.Button(
+            power_frame, text="Fijar referencia = Base", command=self._on_fijar_referencia_base
+        )
+        self.fix_ref_btn.grid(row=1, column=3, columnspan=2, sticky="w", **pad)
+
+        speed_frame = ttk.LabelFrame(self.content, text="Parámetros de movimiento")
         speed_frame.grid(row=2, column=0, columnspan=2, sticky="ew", **pad)
 
         ttk.Label(speed_frame, text="Velocidad").grid(row=0, column=0, **pad)
@@ -196,7 +326,7 @@ class JetcobotControlPanel(ttk.Frame):
 
         ttk.Checkbutton(speed_frame, text="Auto-actualizar estado", variable=self.auto_update).grid(row=0, column=6, **pad)
 
-        joints_frame = ttk.LabelFrame(self, text="Articulaciones")
+        joints_frame = ttk.LabelFrame(self.content, text="Articulaciones")
         joints_frame.grid(row=3, column=0, sticky="nsew", **pad)
 
         for i, name in enumerate(JOINT_NAMES):
@@ -209,8 +339,31 @@ class JetcobotControlPanel(ttk.Frame):
             ttk.Label(joints_frame, textvariable=value_var, width=8).grid(row=i, column=3, **pad)
             self.angle_labels.append(value_var)
 
-        side_frame = ttk.Frame(self)
+        side_frame = ttk.Frame(self.content)
         side_frame.grid(row=3, column=1, sticky="nsew", **pad)
+
+        cart_frame = ttk.LabelFrame(side_frame, text="Movimiento cartesiano del gripper (X,Y,Z,R,P,Yaw)")
+        cart_frame.pack(fill="x", **pad)
+        ttk.Label(
+            cart_frame,
+            text="Mueve el gripper en línea recta en esa coordenada (el robot resuelve\n"
+                 "la cinemática inversa solo) — usa esto para bajar en Z sin desviarte.",
+            justify="left",
+        ).grid(row=0, column=0, columnspan=4, sticky="w", **pad)
+        for i, name in enumerate(CART_AXIS_NAMES):
+            axis_id = i + 1
+            ttk.Label(cart_frame, text=name, width=4).grid(row=1 + i // 3, column=(i % 3) * 3, **pad)
+            ttk.Button(cart_frame, text="-", width=3, command=lambda a=axis_id: self._on_cart_jog(a, -1)).grid(
+                row=1 + i // 3, column=(i % 3) * 3 + 1, **pad
+            )
+            ttk.Button(cart_frame, text="+", width=3, command=lambda a=axis_id: self._on_cart_jog(a, 1)).grid(
+                row=1 + i // 3, column=(i % 3) * 3 + 2, **pad
+            )
+        ttk.Label(cart_frame, text="Paso (mm / °)").grid(row=3, column=0, **pad)
+        ttk.Scale(cart_frame, from_=1, to=20, variable=self.cart_step_var, orient="horizontal", length=140).grid(
+            row=3, column=1, columnspan=2, **pad
+        )
+        ttk.Label(cart_frame, textvariable=self.cart_step_var, width=3).grid(row=3, column=3, **pad)
 
         gripper_frame = ttk.LabelFrame(side_frame, text="Gripper")
         gripper_frame.pack(fill="x", **pad)
@@ -229,8 +382,8 @@ class JetcobotControlPanel(ttk.Frame):
         ttk.Label(coords_frame, textvariable=self.coords_label_var, width=32).pack(**pad)
         ttk.Button(coords_frame, text="Leer estado ahora", command=self._on_read_now).pack(**pad)
 
-        log_frame = ttk.LabelFrame(self, text="Registro")
-        log_frame.grid(row=4, column=0, columnspan=2, sticky="ew", **pad)
+        log_frame = ttk.LabelFrame(self.content, text="Registro")
+        log_frame.grid(row=5, column=0, columnspan=2, sticky="ew", **pad)
         self.log_text = tk.Text(log_frame, height=8, width=90, state="disabled")
         self.log_text.pack(**pad)
 
@@ -252,7 +405,8 @@ class JetcobotControlPanel(ttk.Frame):
     def _set_controls_enabled(self, enabled):
         state = "normal" if enabled else "disabled"
         for widget in (self.power_on_btn, self.power_off_btn, self.release_btn,
-                       self.focus_btn, self.home_btn, self.stop_btn):
+                       self.focus_btn, self.home_btn, self.stop_btn, self.resume_btn,
+                       self.fix_ref_btn):
             widget.configure(state=state)
         self.connect_btn.configure(state="disabled" if enabled else "normal")
         self.disconnect_btn.configure(state="normal" if enabled else "disabled")
@@ -280,6 +434,8 @@ class JetcobotControlPanel(ttk.Frame):
                     self.coords_label_var.set(", ".join(f"{v:.1f}" for v in payload))
                 elif kind == "gripper":
                     self.gripper_label_var.set(str(payload))
+                elif kind == "ref_frame":
+                    self.ref_frame_var.set(payload)
                 else:
                     self._on_extra_message(kind, payload)
         except queue.Empty:
@@ -303,6 +459,7 @@ class JetcobotControlPanel(ttk.Frame):
                 self._log(f"Conectado a {port} @ {baud}")
                 self.msg_queue.put(("status", True))
                 self._start_polling()
+                self._reportar_referencia()
             except Exception as exc:
                 self._log(f"No se pudo conectar: {exc}")
                 self.msg_queue.put(("status", False))
@@ -347,23 +504,61 @@ class JetcobotControlPanel(ttk.Frame):
         self._log("PARADA DE EMERGENCIA")
         self._run_async(self.robot.stop)
 
+    def _on_resume(self):
+        self._log("Reanudando movimiento")
+        self._run_async(self.robot.resume)
+
+    def _reportar_referencia(self):
+        """Lee y muestra el sistema de referencia actual (0=base, 1=herramienta).
+
+        Los movimientos cartesianos (X,Y,Z) solo van a coincidir con los ejes
+        reales de la base si está en 0. RobotController.connect() ya intenta
+        fijarlo solo, esto es para confirmarlo (y poder corregirlo a mano si
+        el intento automático no tomó).
+        """
+        ref = self.robot.get_reference_frame()
+        if ref is None:
+            self._log("No se pudo leer el sistema de referencia (get_reference_frame).")
+            self.msg_queue.put(("ref_frame", "Referencia: desconocida"))
+            return
+        texto = "Referencia: BASE (correcto)" if ref == 0 else "Referencia: HERRAMIENTA (¡mueve raro en X/Y/Z!)"
+        self._log(f"get_reference_frame() = {ref} -> {texto}")
+        self.msg_queue.put(("ref_frame", texto))
+
+    def _on_fijar_referencia_base(self):
+        self._log("Fijando referencia = Base (0)")
+
+        def hacerlo():
+            self.robot.set_reference_frame_base()
+            self._reportar_referencia()
+
+        self._run_async(hacerlo)
+
     # ------------------------------------------------------------------
     # Articulaciones y gripper
     # ------------------------------------------------------------------
     def _on_jog(self, joint_id, direction):
         step = self.step_var.get() * direction
+        self._log(f"Jog J{joint_id}: {step:+d}°")
         self._run_async(self.robot.jog_joint, joint_id, step, self.speed_var.get())
 
+    def _on_cart_jog(self, axis_id, direction):
+        step = self.cart_step_var.get() * direction
+        self._log(f"Jog cartesiano eje {CART_AXIS_NAMES[axis_id - 1]}: {step:+d}")
+        self._run_async(self.robot.jog_coord_axis, axis_id, step, self.speed_var.get())
+
     def _on_gripper_set(self, value):
+        self._log(f"Gripper -> {value}")
         self._run_async(self.robot.set_gripper, value, self.speed_var.get())
 
     def _on_gripper_step(self, direction):
         step = self.gripper_step_var.get() * direction
+        self._log(f"Jog gripper: {step:+d}")
 
         def do_step():
             current = self.robot.get_gripper_value()
-            if isinstance(current, (list, tuple)):
-                current = current[0]
+            if current is None:
+                raise RuntimeError("No se pudo leer el valor actual del gripper, intenta de nuevo.")
             self.robot.set_gripper(current + step, self.speed_var.get())
 
         self._run_async(do_step)
@@ -411,7 +606,7 @@ class JetcobotGUI(tk.Tk):
     def __init__(self):
         super().__init__()
         self.title("JetCobot - Control básico")
-        self.resizable(False, False)
+        self.geometry("1150x800")
         self.panel = JetcobotControlPanel(self)
         self.panel.pack(fill="both", expand=True)
         self.protocol("WM_DELETE_WINDOW", self._on_close)

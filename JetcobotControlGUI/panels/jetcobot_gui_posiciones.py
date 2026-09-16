@@ -10,21 +10,24 @@ con mc.send_coords(). Las posiciones se guardan en posiciones_guardadas.json
 en esta misma carpeta, así persisten entre ejecuciones.
 
 Uso:
-    python3 jetcobot_gui_posiciones.py
+    python3 panels/jetcobot_gui_posiciones.py
 
 Requiere:
     pip install pymycobot
 """
 
 import json
+import sys
 import tkinter as tk
 from pathlib import Path
 from tkinter import ttk
 
+sys.path.insert(0, str(Path(__file__).resolve().parent))
+
 from jetcobot_gui import JetcobotControlPanel
 
 COORD_NAMES = ["X", "Y", "Z", "R", "P", "Yaw"]
-POSITIONS_FILE = Path(__file__).parent / "posiciones_guardadas.json"
+POSITIONS_FILE = Path(__file__).resolve().parent.parent / "data" / "posiciones_guardadas.json"
 
 
 def load_positions():
@@ -38,6 +41,7 @@ def load_positions():
 
 
 def save_positions(positions):
+    POSITIONS_FILE.parent.mkdir(parents=True, exist_ok=True)
     with open(POSITIONS_FILE, "w", encoding="utf-8") as f:
         json.dump(positions, f, indent=2, ensure_ascii=False)
 
@@ -59,8 +63,8 @@ class PosicionesPanel(JetcobotControlPanel):
     def _build_positions_panel(self):
         pad = {"padx": 6, "pady": 4}
 
-        panel = ttk.LabelFrame(self, text="Posiciones guardadas (coordenadas)")
-        panel.grid(row=5, column=0, columnspan=2, sticky="ew", **pad)
+        panel = ttk.LabelFrame(self.content, text="Posiciones guardadas (coordenadas)")
+        panel.grid(row=4, column=0, columnspan=2, sticky="ew", **pad)
 
         add_frame = ttk.Frame(panel)
         add_frame.pack(fill="x", **pad)
@@ -119,12 +123,20 @@ class PosicionesPanel(JetcobotControlPanel):
         is_new = name not in self.saved_positions
         self.saved_positions[name] = coords
         save_positions(self.saved_positions)
-        self._log(f"Posición '{name}' guardada: {coords}")
 
         if is_new:
+            self._log(f"Posición '{name}' creada: {coords}")
             self._add_position_row(name)
         else:
+            self._log(f"Posición '{name}' YA EXISTÍA, se actualizó con: {coords}")
             self.position_rows[name]["coords_label"].configure(text=self._format_coords(coords))
+
+        # Limpiar el formulario para la siguiente posición — si no se
+        # cambia el nombre acá, la próxima vez se sobrescribiría esta
+        # misma posición en vez de crear una nueva.
+        self.pos_name_entry.delete(0, "end")
+        for entry in self.pos_coord_entries:
+            entry.delete(0, "end")
 
     def _on_delete_position(self, name):
         self.saved_positions.pop(name, None)
@@ -174,7 +186,7 @@ class JetcobotGUIPosiciones(tk.Tk):
     def __init__(self):
         super().__init__()
         self.title("JetCobot - Control + posiciones guardadas")
-        self.resizable(False, False)
+        self.geometry("1150x800")
         self.panel = PosicionesPanel(self)
         self.panel.pack(fill="both", expand=True)
         self.protocol("WM_DELETE_WINDOW", self._on_close)
