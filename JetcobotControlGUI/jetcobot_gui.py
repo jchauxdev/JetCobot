@@ -24,7 +24,7 @@ DEFAULT_BAUD = 1000000
 JOINT_NAMES = ["J1", "J2", "J3", "J4", "J5", "J6"]
 ANGLE_MIN = [-168, -135, -150, -145, -165, -180]
 ANGLE_MAX = [168, 90, 150, 145, 165, 180]
-HOME_ANGLES = [0, 0, 0, 0, 0, -45]
+HOME_ANGLES = [0, 0, 0, 0, 0, 45]
 
 GRIPPER_MIN = 0
 GRIPPER_MAX = 100
@@ -80,6 +80,9 @@ class RobotController:
     def send_angles(self, angles, speed):
         self._call(self.mc.send_angles, angles, speed)
 
+    def send_coords(self, coords, speed):
+        self._call(self.mc.send_coords, coords, speed)
+
     def set_gripper(self, value, speed):
         value = max(GRIPPER_MIN, min(GRIPPER_MAX, value))
         self._call(self.mc.set_gripper_value, value, speed)
@@ -124,6 +127,10 @@ class JetcobotGUI(tk.Tk):
         self._set_controls_enabled(False)
         self.after(100, self._process_queue)
         self.protocol("WM_DELETE_WINDOW", self._on_close)
+
+    def _on_extra_message(self, kind, payload):
+        """Hook para que subclases manejen tipos de mensaje adicionales en la cola."""
+        pass
 
     # ------------------------------------------------------------------
     # Construccion de la interfaz
@@ -269,6 +276,8 @@ class JetcobotGUI(tk.Tk):
                     self.coords_label_var.set(", ".join(f"{v:.1f}" for v in payload))
                 elif kind == "gripper":
                     self.gripper_label_var.set(str(payload))
+                else:
+                    self._on_extra_message(kind, payload)
         except queue.Empty:
             pass
         self.after(100, self._process_queue)
