@@ -21,7 +21,7 @@ import tkinter as tk
 from pathlib import Path
 from tkinter import ttk
 
-from jetcobot_gui import JetcobotGUI
+from jetcobot_gui import JetcobotControlPanel
 
 COORD_NAMES = ["X", "Y", "Z", "R", "P", "Yaw"]
 POSITIONS_FILE = Path(__file__).parent / "posiciones_guardadas.json"
@@ -42,12 +42,13 @@ def save_positions(positions):
         json.dump(positions, f, indent=2, ensure_ascii=False)
 
 
-class JetcobotGUIPosiciones(JetcobotGUI):
-    def __init__(self):
+class PosicionesPanel(JetcobotControlPanel):
+    """JetcobotControlPanel + panel de posiciones guardadas por coordenadas."""
+
+    def __init__(self, master, **kwargs):
         self.saved_positions = load_positions()
         self.position_rows = {}
-        super().__init__()
-        self.title("JetCobot - Control + posiciones guardadas")
+        super().__init__(master, **kwargs)
         self._refresh_position_list()
 
     # ------------------------------------------------------------------
@@ -165,6 +166,22 @@ class JetcobotGUIPosiciones(JetcobotGUI):
     def _refresh_position_list(self):
         for name in list(self.saved_positions.keys()):
             self._add_position_row(name)
+
+
+class JetcobotGUIPosiciones(tk.Tk):
+    """Ventana independiente que aloja el PosicionesPanel (uso standalone)."""
+
+    def __init__(self):
+        super().__init__()
+        self.title("JetCobot - Control + posiciones guardadas")
+        self.resizable(False, False)
+        self.panel = PosicionesPanel(self)
+        self.panel.pack(fill="both", expand=True)
+        self.protocol("WM_DELETE_WINDOW", self._on_close)
+
+    def _on_close(self):
+        self.panel.shutdown()
+        self.destroy()
 
 
 if __name__ == "__main__":

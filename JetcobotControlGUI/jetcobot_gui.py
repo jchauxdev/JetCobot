@@ -103,11 +103,16 @@ class RobotController:
         self._call(self.mc.stop)
 
 
-class JetcobotGUI(tk.Tk):
-    def __init__(self):
-        super().__init__()
-        self.title("JetCobot - Control básico")
-        self.resizable(False, False)
+class JetcobotControlPanel(ttk.Frame):
+    """Panel con conexión, motores, articulaciones y gripper.
+
+    Es un ttk.Frame para poder insertarse en cualquier contenedor (una
+    ventana propia, una pestaña de un ttk.Notebook, etc). Para una ventana
+    independiente usa la clase JetcobotGUI de más abajo.
+    """
+
+    def __init__(self, master, **kwargs):
+        super().__init__(master, **kwargs)
 
         self.robot = RobotController()
         self.msg_queue = queue.Queue()
@@ -126,7 +131,6 @@ class JetcobotGUI(tk.Tk):
         self._build_ui()
         self._set_controls_enabled(False)
         self.after(100, self._process_queue)
-        self.protocol("WM_DELETE_WINDOW", self._on_close)
 
     def _on_extra_message(self, kind, payload):
         """Hook para que subclases manejen tipos de mensaje adicionales en la cola."""
@@ -311,10 +315,10 @@ class JetcobotGUI(tk.Tk):
         self._log("Desconectado.")
         self.msg_queue.put(("status", False))
 
-    def _on_close(self):
+    def shutdown(self):
+        """Detiene el sondeo y cierra la conexión. Llamar antes de destruir la ventana."""
         self._stop_polling()
         self.robot.disconnect()
-        self.destroy()
 
     # ------------------------------------------------------------------
     # Motores
@@ -399,6 +403,22 @@ class JetcobotGUI(tk.Tk):
                 except Exception as exc:
                     self._log(f"Error leyendo estado: {exc}")
             time.sleep(POLL_INTERVAL)
+
+
+class JetcobotGUI(tk.Tk):
+    """Ventana independiente que aloja el JetcobotControlPanel (uso standalone)."""
+
+    def __init__(self):
+        super().__init__()
+        self.title("JetCobot - Control básico")
+        self.resizable(False, False)
+        self.panel = JetcobotControlPanel(self)
+        self.panel.pack(fill="both", expand=True)
+        self.protocol("WM_DELETE_WINDOW", self._on_close)
+
+    def _on_close(self):
+        self.panel.shutdown()
+        self.destroy()
 
 
 if __name__ == "__main__":
