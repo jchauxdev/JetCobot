@@ -1,0 +1,8 @@
+Para deshabilitar la obligación de tener conectada pantalla para conexión remota
+sudo cp /etc/X11/xorg.conf /etc/X11/xorg.conf.bak
+sudo cp /tmp/claude-1000/-home-nvidia-Desktop/8b7c7b1d-3a03-4ca5-96f0-8e16c196cb5b/scratchpad/xorg.conf.headless /etc/X11/xorg.conf
+sudo systemctl restart gdm3
+
+Para restaurar la configuración
+sudo cp /etc/X11/xorg.conf.bak /etc/X11/xorg.conf
+sudo systemctl restart gdm3
