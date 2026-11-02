@@ -1,0 +1,16 @@
+NAVEGACION CON NAV2 (ROS 2 HUMBLE) - reemplaza a move_base_custom (ROS 1, se conserva en PAQUETE/ como referencia)
+Ver DA-17.1 y DA-17.2.
+
+PASO 1. Mapa (DA-16.1):
+  ros2 launch mr_bringup robot.launch.py            (o virtual.launch.py)
+  ros2 launch mr_bringup slam.launch.py rviz:=true
+  ros2 run nav2_map_server map_saver_cli -f ~/mapas/laboratorio
+
+PASO 2. Navegacion:
+  ros2 launch mr_bringup navigation.launch.py map:=$HOME/mapas/laboratorio.yaml rviz:=true
+
+PASO 3. Estaciones con nombre (mr_bringup/config/estaciones.yaml):
+  ros2 run mr_navigation guardar_punto estacion_A
+  ros2 run mr_navigation estaciones
+  ros2 run mr_navigation ir_a estacion_A
+  ros2 run mr_navigation recorrido cobot estacion_A estacion_B inicio --vueltas 2

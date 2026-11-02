@@ -1,0 +1,41 @@
+﻿1.2.3
+Legacy Products
+	-For legacy products not supported by this release, 
+	 users can download the legacy version of Motion
+	 Studio using the link in the Help menu.
+
+Firmware 1.2.3 Important Information:
+	-Adjustment to Current Sesne calibration
+
+Firmware 1.2.2 Important Information:
+	-Added Auto Max Main Voltage + Offset Setting(default)
+	-Defaults and Write Settings commands reset unit
+	 (eg: auto run scripts will start)
+
+Firmware 1.2.1 Important Information:
+	-Added Idle Progress Marqee during Erase cycle of update
+	-Added Legacy download link to Help menu
+	-Fixed a bug in Resistive Mode
+
+Firmware 1.2.0 Important Information:
+	-Removed MCP models no longer supported.
+	 If your model is too old you can revert to 
+	 the previous version using the uninstaller.
+
+	-Removed Current blanking percentage
+	 setting(no longer needed)
+
+	-Replaced Signmagnitude/Locked Antiphase PWM
+	 mode with Inductive/Resistive load modes.
+
+	-Added idle mode electronic braking or freewheel.
+
+	-Added idle delay. Specifies time after motor 
+	 commanded to stop(0 pwm) until mosfet driver
+	 idles and aux brake output triggered(if enabled)
+	 and freewheeling triggered(if enabled).
+
+	-Added additional Short Circuit Detection
+
+	-Added maximum Power/Speed percentage settings
+	 for Analog/RC modes

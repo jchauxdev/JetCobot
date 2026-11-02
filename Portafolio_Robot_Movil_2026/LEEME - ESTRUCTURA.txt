@@ -1,0 +1,19 @@
+PORTAFOLIO - TRANSFERENCIA ROBOT MOVIL DIFERENCIAL CON ROS 2 HUMBLE (2026)
+Autor: Julian Rene Chaux Cedeno - SENA
+
+- Guia_Aprendizaje_Robot_Movil_ROS2.docx: guia de aprendizaje de la semana (03-06/11/2026).
+- Carpetas 8 a 21, cada una con sus documentos de apoyo (DA-N.M):
+   8. Construccion del robot
+   9. Espacio de trabajo ROS 2 (robots_ws, comun al robot movil y al cobot; se usa en el PC y en el robot)
+  10. Configuracion del RoboClaw (Motion Studio)
+  11. Linux y ROS 2 Humble: Raspberry Pi 4, Jetson Nano (Docker), SSH, VNC, Jetson AGX Orin, Jetson Orin Nano
+  12. Driver ROS 2 del RoboClaw, calibracion de la odometria y reglas udev
+  13. Red local, red ROS 2 y arranque automatico (systemd)
+  14. Modelo URDF y RViz2         15. Camara web          16. Lidar
+  17. Generacion del mapa         18. Nav2 y puntos con nombre
+  19. Teleoperacion               20. RealSense D435i     21. Integracion robot movil - cobot
+- Espacio de trabajo: ~/robots_ws se construye paso a paso (DA-9.1). Cada documento, en su Paso 0,
+  copia desde la reserva solo los paquetes que usa.
+- mr_ws.zip: material de reserva con todo el codigo (tambien en 12/REPOSITORIOS y en el repositorio
+  https://github.com/jchauxdev/JetCobot, carpeta Portafolio_Robot_Movil_2026). Se descomprime en ~/mr_reserva.
+- Jetson Nano: JetPack 4.6.6 (DA-11.1); la imagen de la tarjeta no se incluye por su tamano.

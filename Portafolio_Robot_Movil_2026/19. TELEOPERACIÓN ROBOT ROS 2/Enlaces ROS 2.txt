@@ -1,0 +1,5 @@
+TELEOPERACION EN ROS 2 (DA-18.1)
+- Teclado: ros2 run teleop_twist_keyboard teleop_twist_keyboard
+- Celular: ros2 launch mr_logistics logistica.launch.py  ->  http://<IP del equipo>:8080/teleop
+- ROS-Mobile (app-release.apk, version anterior): funciona solo con ROS 1 (ROS_MASTER_URI); no se usa con ROS 2.
+  https://github.com/ROS-Mobile/ROS-Mobile-Android

@@ -1,0 +1,13 @@
+PASO 1:
+cd ~/catkin_ws/src
+catkin_create_pkg move_base_custom rospy std_msgs sensor_msgs geometry_msgs tf nav_msgs move_base
+
+PASO 2:
+COPIAR TODAS LAS CARPETAS QUE ESTÁN DENTRO DEL PAQUETE
+
+PASO 3:
+rosdep install --from-paths src --ignore-src -r -y
+catkin_make
+
+PASO 4:
+roslaunch move_base_custom move_base.launch

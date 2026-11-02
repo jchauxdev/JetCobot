@@ -3,3 +3,13 @@ __pycache__/
 .vscode/
 ~$*
 ~WRL*.tmp
+
+# Archivos de trabajo de Claude (copias de seguridad y scripts)
+_tmp_revision/
+
+# Restos de archivos reemplazados mientras estaban abiertos
+.fuse_hidden*
+
+# Archivos de mas de 100 MB (GitHub no los acepta): imagenes de JetPack y videos
+**/ISO JETPACK/
+Portafolio_Robot_Movil_2026/10. CONFIGURACIÓN ROBOCLAW/MATERIAL DE APOYO/Configuración Roboclaw.mp4

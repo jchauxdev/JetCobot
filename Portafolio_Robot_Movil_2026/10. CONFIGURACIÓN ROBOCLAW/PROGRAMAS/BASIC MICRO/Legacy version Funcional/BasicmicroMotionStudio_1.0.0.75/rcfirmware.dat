@@ -1,0 +1,61 @@
+﻿4.2.8
+Legacy Products
+	-For legacy products not supported by this release, users
+	 can download the legacy version of Motion Studio using
+	 the link in the Help menu.
+
+Firmware 4.2.8 Important Information:
+	-Added support for new models of Roboxlaw 60A and 60HV
+	-Fixed a potential e-stop glitch on old revisions of Roboclaw
+
+Firmware 4.2.7 Important Information:
+	-Adjustment to Current Sesne calibration
+
+Firmware 4.2.6 Important Information:
+	-Fixed a regression bug in Analog Auto Calibration
+
+Firmware 4.2.5 Important Information:
+	-Added Auto Max Main Voltage + Offset Setting(default)
+	-Defaults and Write Settings commands reset unit
+	 (auto homing executes if active and pin modes are updated on reset)
+
+Firmware 4.2.4 Important Information:
+	-Added support for new revision Roboclaws. 2x7A V6, 2x15A V6, 2x30A V6, 2x45A V6
+
+Firmware 4.2.3 Important Information:
+	-Fixed sign/unsign math calculation in READCURRENT for Solo300 models.  Caused invalid current readings at low duty.
+
+Firmware 4.2.2 Important Information:
+	-Added support for Roboclaw 2x200 V7, 2x300 V7 and 2x400 V7
+
+Firmware 4.2.1 Important Information:
+	-Added Idle Progress Marqee during Erase cycle of update
+	-Added Legacy download link to Help menu
+	-Removed debug code that was potentially causing 
+	 issues with position readings on some Roboclaw models
+	-Changed logic battery error on 2x7A controllers
+	 (should not have trigged when main battery was above
+	 Logic Battery minimum)
+
+Firmware 4.2.0 Important Information:
+	-Removed Roboclaw models no longer supported.
+	 If your model is too old you can revert to 
+	 the previous version using the uninstaller.
+
+	-Removed Current blanking percentage
+	 setting(no longer needed)
+
+	-Replaced Signmagnitude/Locked Antiphase PWM
+	 mode with Inductive/Resistive load modes.
+
+	-Added idle mode electronic braking or freewheel.
+
+	-Added idle delay. Specifies time after motor 
+	 commanded to stop(0 pwm) until mosfet driver
+	 idles and aux brake output triggered(if enabled)
+	 and freewheeling triggered(if enabled).
+
+	-Added additional Short Circuit Detection
+
+	-Added maximum Power/Speed percentage settings
+	 for Analog/RC modes

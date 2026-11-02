@@ -1,0 +1,25 @@
+<launch>
+  <!-- Nodo move_base -->
+  <node pkg="move_base" type="move_base" name="move_base" output="screen">
+    <param name="shutdown_costmaps" value="false"/>
+    <param name="controller_frequency" value="10.0"/>
+    <param name="controller_patience" value="3.0"/>
+    <param name="planner_frequency" value="5.0"/>
+    <param name="planner_patience" value="5.0"/>
+
+    <rosparam file="$(find move_base_custom)/config/costmap_common_params.yaml" command="load"/>
+    <rosparam file="$(find move_base_custom)/config/local_costmap_params.yaml" command="load"/>
+    <rosparam file="$(find move_base_custom)/config/global_costmap_params.yaml" command="load"/>
+    <rosparam file="$(find move_base_custom)/config/base_local_planner_params.yaml" command="load"/>
+
+    <remap from="cmd_vel" to="/cmd_vel"/>
+    <remap from="scan" to="/scan"/>
+  </node>
+
+  <!-- Nodo map_server para cargar el mapa -->
+  <!--<node name="map_server" pkg="map_server" type="map_server" args="$(find move_base_custom)/maps/mapa.yaml" />-->
+
+  <!-- Nodo para publicar los TF correctamente -->
+  <node pkg="tf2_ros" type="static_transform_publisher" name="map_to_odom" 
+        args="0 0 0 0 0 0 map odom" />
+</launch>

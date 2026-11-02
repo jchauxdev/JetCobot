@@ -1,0 +1,7 @@
+INTEGRACION ROBOT MOVIL - COBOT (DA-20.1)
+Codigo: mr_ws (paquetes mr_logistics, mr_cobot_bridge, mr_navigation, mr_interfaces) + jc_ws (celda del JetCobot).
+Robot:      ros2 launch mr_bringup robot.launch.py namespace:=mr
+            ros2 launch mr_bringup navigation.launch.py namespace:=mr map:=$HOME/mapas/laboratorio.yaml
+App:        ros2 launch mr_logistics logistica.launch.py namespace:=mr     -> http://<IP>:8080
+Cobot:      (celda jc_ws en marcha) ros2 launch mr_cobot_bridge cobot_station.launch.py
+Pedido CLI: ros2 run mr_logistics pedido rojo 2 estacion_B

@@ -1,0 +1,273 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- This URDF was automatically created by SolidWorks to URDF Exporter! Originally created by Stephen Brawner (brawner@gmail.com) 
+     Commit Version: 1.6.0-4-g7f85cfe  Build Version: 1.6.7995.38578
+     For more information, please see http://wiki.ros.org/sw_urdf_exporter -->
+<robot
+  name="robot">
+  <link
+    name="base_link">
+    <inertial>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <mass
+        value="1.4812" />
+      <inertia
+        ixx="0.0032037"
+        ixy="5.0075E-08"
+        ixz="-2.6065E-07"
+        iyy="0.0039833"
+        iyz="3.02E-05"
+        izz="0.0065433" />
+    </inertial>
+    <visual>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 1.5708" />
+      <geometry>
+        <mesh
+          filename="package://robot/meshes/base_link.STL" />
+      </geometry>
+      <material
+        name="">
+        <color
+          rgba="0.85882 0.85882 0.85882 0.1" />
+      </material>
+    </visual>
+    <collision>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 1.5708" />
+      <geometry>
+        <mesh
+          filename="package://robot/meshes/base_link.STL" />
+      </geometry>
+    </collision>
+  </link>
+
+
+  <link
+    name="RuedaIzquierda_Link">
+    <inertial>
+      <origin
+        xyz="-9.0624E-06 -1.5346E-05 -0.011145"
+        rpy="0 0 0" />
+      <mass
+        value="0.024801" />
+      <inertia
+        ixx="1.6454E-05"
+        ixy="3.2792E-09"
+        ixz="3.8538E-11"
+        iyy="1.6458E-05"
+        iyz="4.994E-11"
+        izz="3.2587E-05" />
+    </inertial>
+    <visual>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://robot/meshes/RuedaIzquierda_Link.STL" />
+      </geometry>
+      <material
+        name="">
+        <color
+          rgba="0.79216 0.81961 0.93333 1" />
+      </material>
+    </visual>
+    <collision>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://robot/meshes/RuedaIzquierda_Link.STL" />
+      </geometry>
+    </collision>
+  </link>
+  <joint
+    name="RuedaIzquierda_Joint"
+    type="continuous">
+    <origin
+      xyz="0.046668 0.1008 0.0188"
+      rpy="1.5708 -0.34003 0" />
+    <parent
+      link="base_link" />
+    <child
+      link="RuedaIzquierda_Link" />
+    <axis
+      xyz="0 0 1" />
+  </joint>
+
+  
+  <link
+    name="RuedaDerecha_Link">
+    <inertial>
+      <origin
+        xyz="-9.6757E-06 -1.5373E-05 -0.011145"
+        rpy="0 0 0" />
+      <mass
+        value="0.024801" />
+      <inertia
+        ixx="1.6454E-05"
+        ixy="3.5588E-11"
+        ixz="2.4485E-11"
+        iyy="1.6458E-05"
+        iyz="5.1482E-11"
+        izz="3.2587E-05" />
+    </inertial>
+    <visual>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://robot/meshes/RuedaDerecha_Link.STL" />
+      </geometry>
+      <material
+        name="">
+        <color
+          rgba="0.79216 0.81961 0.93333 1" />
+      </material>
+    </visual>
+    <collision>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://robot/meshes/RuedaDerecha_Link.STL" />
+      </geometry>
+    </collision>
+  </link>
+  <joint
+    name="RuedaDerecha_Joint"
+    type="continuous">
+    <origin
+      xyz="0.046668 -0.1008 0.0188"
+      rpy="1.5708 -0.02552 -3.1416" />
+    <parent
+      link="base_link" />
+    <child
+      link="RuedaDerecha_Link" />
+    <axis
+      xyz="0 0 1" />
+  </joint>
+
+
+  <link
+    name="Camara_Link">
+    <inertial>
+      <origin
+        xyz="-5.878E-05 0.0011119 -0.0003685"
+        rpy="0 0 0" />
+      <mass
+        value="0.01531" />
+      <inertia
+        ixx="1.7534E-06"
+        ixy="-7.2563E-11"
+        ixz="1.0539E-09"
+        iyy="1.574E-05"
+        iyz="-2.3537E-08"
+        izz="1.6733E-05" />
+    </inertial>
+    <visual>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://robot/meshes/Camara_Link.STL" />
+      </geometry>
+      <material
+        name="">
+        <color
+          rgba="0.75294 0.75294 0.75294 1" />
+      </material>
+    </visual>
+    <collision>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://robot/meshes/Camara_Link.STL" />
+      </geometry>
+    </collision>
+  </link>
+  <joint
+    name="Camara_Joint"
+    type="fixed">
+    <origin
+      xyz="0.096775 -0.0018421 0.1263"
+      rpy="1.5708 0 1.5708" />
+    <parent
+      link="base_link" />
+    <child
+      link="Camara_Link" />
+    <axis
+      xyz="0 0 0" />
+  </joint>
+
+
+  
+  <link
+    name="Lidar_Link">
+    <inertial>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <mass
+        value="0" />
+      <inertia
+        ixx="0"
+        ixy="0"
+        ixz="0"
+        iyy="0"
+        iyz="0"
+        izz="0" />
+    </inertial>
+    <visual>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://robot/meshes/Lidar_Link.STL" />
+      </geometry>
+      <material
+        name="">
+        <color
+          rgba="1 1 1 1" />
+      </material>
+    </visual>
+    <collision>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://robot/meshes/Lidar_Link.STL" />
+      </geometry>
+    </collision>
+  </link>
+  <joint
+    name="Lidar_Joint"
+    type="fixed">
+    <origin
+      xyz="0.07775 0 0.215"
+      rpy="1.5708 0 3.1416" />
+    <parent
+      link="base_link" />
+    <child
+      link="Lidar_Link" />
+    <axis
+      xyz="0 0 0" />
+    <limit
+      lower="0"
+      upper="0"
+      effort="0"
+      velocity="0" />
+  </joint>
+</robot>
