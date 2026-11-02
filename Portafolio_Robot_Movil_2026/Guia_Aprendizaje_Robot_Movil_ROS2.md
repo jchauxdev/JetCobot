@@ -95,15 +95,23 @@ Los participantes analizan qué necesita un robot móvil para pasar de ser teleo
 
 **Descripción de la actividad:**
 
-1. Observar el robot del laboratorio y un video de un robot móvil logístico (AMR).
-1. Discutir: ¿qué pasa si el robot cree que avanzó 1 m pero avanzó 0,97 m? ¿cómo sabe dónde está? ¿qué riesgos aparecen al compartir el espacio con personas?
-1. Registrar la meta del equipo para la semana.
+1. Ver en grupo el video «RB-KAIROS+: manipulación móvil autónoma con IA agéntica» (Robotnik, 1 min, en inglés; active los subtítulos en español): [https://www.youtube.com/watch?v=eMJkA2B7RYs](https://www.youtube.com/watch?v=eMJkA2B7RYs), y observar el robot móvil del laboratorio.
+1. Conversar a partir de las preguntas orientadoras (el instructor modera y anota las ideas en el tablero):
+   1. **Lo que vimos:** ¿qué tarea le pide el operador al robot y cómo se la pide? ¿Qué cambia frente a programar la tarea con código?
+   1. ¿Cómo sabe el robot cuál es la caja correcta y dónde queda el destino? ¿Qué sensores y qué información necesita?
+   1. ¿Por qué el sistema pide confirmación antes de ejecutar? ¿Qué podría salir mal si no la pidiera?
+   1. **Nuestro robot:** ¿qué partes del robot del video tendrá el robot móvil de esta semana (base diferencial, lidar, cámara, navegación) y cuáles aporta la celda del cobot?
+   1. Si el robot cree que avanzó 1 m pero avanzó 0,97 m, ¿llegaría a la caja? ¿Cómo corrige ese error un robot autónomo para saber dónde está?
+   1. En la App de logística del curso el pedido se hace con un formulario o con la orden «ir al punto X». ¿Qué haría falta para pedirlo con la voz o en un chat, como en el video?
+   1. **Seguridad y contexto:** ¿qué riesgos aparecen cuando un manipulador móvil comparte el espacio con personas? ¿Qué medidas de seguridad ve o echa de menos en el video?
+   1. ¿En qué proceso de su centro de formación o de una empresa de la región serviría un robot así? ¿Qué tendría que resolver primero?
+1. Registrar la meta del equipo para la semana: qué tarea completa debe cumplir el robot móvil el día 5, junto con el cobot.
 
 **Ambiente requerido:** Ambiente de aprendizaje tipo aula-laboratorio tecnológico. Para garantizar el bienestar integral de los aprendices e instructores, este espacio debe operar bajo estrictos estándares de seguridad industrial, salud ocupacional y medio ambiente. Esto exige la implementación de condiciones ergonómicas óptimas en el mobiliario para mitigar el riesgo biomecánico, iluminación y climatización adecuadas, señalización clara de rutas de evacuación y disposición de equipos de emergencia. Adicionalmente: laboratorio de robótica con un robot móvil diferencial por equipo (RoboClaw 2x15A, Jetson Nano o Jetson AGX Orin, RPLidar A1, cámara RGB y RealSense D435i), área de pruebas despejada de al menos 6 × 4 m con obstáculos móviles, banco de electrónica con multímetro y fuente, celda del JetCobot, red Wi-Fi del laboratorio sin aislamiento de clientes y acceso a Internet para la instalación de paquetes.
 
-**Estrategias o técnicas didácticas activas:** Aprendizaje basado en problemas, discusión guiada.
+**Estrategias o técnicas didácticas activas:** Análisis de un caso real en video, aprendizaje basado en problemas, discusión guiada.
 
-**Materiales de formación:** Robot móvil, video, tablero.
+**Materiales de formación:** Robot móvil, video «RB-KAIROS+: manipulación móvil autónoma con IA agéntica» (Robotnik, YouTube), video beam, tablero.
 
 **Material de apoyo:** 8.1, 21.1 (escenario).
 

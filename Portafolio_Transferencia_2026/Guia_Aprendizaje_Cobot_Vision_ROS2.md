@@ -99,6 +99,17 @@ Se presenta ROS (Robot Operating System) como middleware y ecosistema de softwar
 
 **Descripción de la actividad:**
 
+1. Para abrir la sesión (15 minutos), ver en grupo el video «RB-KAIROS+: manipulación móvil autónoma con IA agéntica» (Robotnik, 1 min, en inglés; active los subtítulos en español): [https://www.youtube.com/watch?v=eMJkA2B7RYs](https://www.youtube.com/watch?v=eMJkA2B7RYs).
+1. Conversar a partir de las preguntas orientadoras antes de la exposición (el instructor modera y anota las ideas en el tablero):
+   1. **Lo que vimos:** ¿qué pasos sigue el robot desde que recibe la orden hasta que entrega la caja? ¿Cuáles son de percepción, cuáles de planificación y cuáles de ejecución?
+   1. ¿Cómo distingue la caja «Robotnik» de las demás? ¿Cómo lo haría nuestra celda: por color, forma, marcador ArUco o con un detector como YOLO?
+   1. Para agarrar la caja, el brazo necesita conocer su posición respecto a su propia base. ¿Qué datos de la cámara y qué calibración hacen falta?
+   1. **Programar o pedir:** el video dice que no hay que escribir código. ¿Desaparece la programación o cambia de lugar? ¿Quién programó las habilidades que el agente combina?
+   1. Esas habilidades se comunican entre sí: ¿qué piezas de software se necesitan para que «detectar», «planificar» y «mover» se pasen datos? Aquí entra ROS 2: nodos, tópicos, servicios y acciones.
+   1. **Personas y robots:** ¿por qué el operador confirma antes de que el robot actúe? ¿Qué papel tiene la persona en un sistema colaborativo?
+   1. ¿Qué diferencia a este manipulador de un brazo industrial en una celda cerrada? ¿Por qué el JetCobot puede trabajar cerca de personas y qué límites tiene?
+   1. ¿Qué tarea de su entorno se podría resolver con un cobot de escritorio con visión?
+1. Relacionar en el tablero las ideas de la charla (percepción, planificación, ejecución, interfaz con el operador) con las partes A (simulación) y B (robot real) de la transferencia.
 1. Exposición dialogada de los conceptos clave (middleware, DDS, RTPS, RMW, nodo, tópico, mensaje, servicio, acción, parámetro, QoS, dominio, paquete y espacio de trabajo) y de qué es ROS: middleware, herramientas y ecosistema de paquetes, no un sistema operativo. Se contrastan las limitaciones de ROS 1 (nodo maestro como punto único de falla, transporte sin calidad de servicio, sin seguridad ni garantías de tiempo real) con ROS 2; ROS 1 Noetic llegó al fin de su soporte el 31 de mayo de 2025.
 1. Analizar la arquitectura en capas de ROS 2 (rclpy/rclcpp → rcl → rmw → DDS/RTPS) y los mecanismos de comunicación (tópicos, servicios, acciones y parámetros) con ejemplos de código en rclpy; discutir el descubrimiento distribuido, los perfiles de QoS y su regla de compatibilidad, los nodos con ciclo de vida, la composición, SROS 2 y los requisitos de tiempo real.
 1. Revisar el ciclo de distribuciones (Humble, Jazzy, Kilted y Lyrical, con sus versiones de Ubuntu y fechas de fin de soporte) y los criterios para elegir una distribución: sistema operativo, hardware, disponibilidad de paquetes y drivers, y tipo de soporte.
@@ -106,9 +117,9 @@ Se presenta ROS (Robot Operating System) como middleware y ecosistema de softwar
 
 **Ambiente requerido:** Ambiente de aprendizaje tipo aula-laboratorio tecnológico. Para garantizar el bienestar integral de los aprendices e instructores, este espacio debe operar bajo estrictos estándares de seguridad industrial, salud ocupacional y medio ambiente. Esto exige la implementación de condiciones ergonómicas óptimas en el mobiliario para mitigar el riesgo biomecánico, iluminación y climatización adecuadas, señalización clara de rutas de evacuación y disposición de equipos de emergencia. Adicionalmente: laboratorio de robótica con JetCobot, NVIDIA Jetson AGX Orin 32 GB y estación de simulación por equipo, red local cableada, zona de trabajo del cobot delimitada y señalizada, y acceso a Internet para instalación de paquetes.
 
-**Estrategias o técnicas didácticas activas:** Exposición dialogada, análisis de casos reales, lectura de código, discusión técnica guiada.
+**Estrategias o técnicas didácticas activas:** Análisis de un caso real en video, exposición dialogada, análisis de casos reales, lectura de código, discusión técnica guiada.
 
-**Materiales de formación:** Presentación «Introducción a ROS y ROS 2» (formato SENA), video beam, tablero.
+**Materiales de formación:** video «RB-KAIROS+: manipulación móvil autónoma con IA agéntica» (Robotnik, YouTube), presentación «Introducción a ROS y ROS 2» (formato SENA), video beam, tablero.
 
 **Material de apoyo:** Presentación «Introducción a ROS y ROS 2» (Introduccion\_ROS2\_SENA.pptx), DA-02 (sección 2), DA-03.
 
