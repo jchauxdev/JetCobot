@@ -190,6 +190,20 @@ export ROS_LOCALHOST_ONLY=0       # 0 = comunicación por la red (Jetson <-> PC)
 
 En la Jetson se arma el mismo robots\_ws que el equipo construyó paso a paso en la Parte A: se clona el repositorio robots\_ws, se agregan los paquetes y carpetas ya trabajados (todos menos `jc_driver`, que se incorpora en DA-14 al conectar el robot) y se trae el paquete propio `mi_celda` desde el repositorio Git del equipo:
 
+| **Paquete / carpeta** | **Para qué sirve** | **Qué contiene** | **Dónde se usa** |
+|---|---|---|---|
+| `src/jc_interfaces` | Interfaces de la celda del cobot (DA-03 de la transferencia), que mr\_cobot\_bridge usa para leer las detecciones. | msg/ DetectedObject y DetectedObjectArray; srv/ MoveToNamed, MoveToPose y SetGripper; action/ Countdown y PickPlace. | Equipo del cobot. |
+| `src/jc_apps` | Nodos didácticos de la celda (DA-03, DA-05). | talker, listener, countdown, param\_demo, fk\_check, trajectory\_demo, square\_demo, pick\_place\_node y launch celda. | Jetson y PC. |
+| `src/jc_description` | Modelo del cobot (DA-04). | URDF/Xacro del myCobot 280, ros2\_control y descripción para Gazebo. | Jetson y PC. |
+| `src/jc_moveit_config` | Configuración de MoveIt 2 (DA-05). | SRDF, kinematics.yaml, OMPL, límites y controladores. | Jetson y PC. |
+| `src/jc_motion` | Nodos de movimiento en C++ (DA-05). | motion\_server, pose\_goal\_demo y trajectory\_client. | Jetson y PC. |
+| `src/jc_bringup` | Lanzamiento de la celda (DA-06). | launch mock, sim y real; celda.yaml, mundos y modelos de Gazebo. | Jetson y PC. |
+| `src/jc_vision` | Visión de la celda (DA-09). | camera\_node, color\_shape\_detector, aruco\_detector, yolo\_detector, handeye\_calibration y perfiles HSV. | Jetson (con la cámara) y PC. |
+| `tools/` | Scripts de apoyo (DA-06); no se compilan. | fake\_detections.py, synthetic\_camera.py y handeye\_auto.py. | Jetson y PC. |
+| `practicas/` | Prácticas sin ROS (DA-08, DA-11); no se compilan. | dia2\_vision (OpenCV) y dia3\_deep\_learning (PyTorch/YOLO). | Jetson y PC. |
+
+Se agrega con estos comandos:
+
 **Terminal (Jetson)**
 
 ```bash
