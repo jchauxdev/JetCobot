@@ -180,6 +180,9 @@ source /usr/share/colcon_argcomplete/hook/colcon-argcomplete.bash
 export ROS_DOMAIN_ID=N            # el mismo en la Jetson y en el PC del equipo
 export ROS_LOCALHOST_ONLY=0       # 0 = comunicación por la red (Jetson <-> PC)
 [ -f ~/robots_ws/install/setup.bash ] && source ~/robots_ws/install/setup.bash
+# colcon_cd: ir a robots_ws o a un paquete (equivalente de roscd, DA-02 Paso 7.1)
+source /usr/share/colcon_cd/function/colcon_cd.sh
+export _colcon_cd_root=~/robots_ws
 ```
 
 > **Nota:**

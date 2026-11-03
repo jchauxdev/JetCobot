@@ -95,11 +95,11 @@ MoveIt es el marco de manipulación más usado en ROS [7]. En ROS 2 el nodo cent
 
 El espacio de trabajo `~/robots_ws` se construye a medida que avanza la transferencia: cada documento incorpora **solo** el material que usa. Agregue desde el repositorio robots\_ws (DA-02, Paso 7) lo siguiente y revise su contenido antes de ejecutarlo:
 
-| **Se incorpora** | **Qué contiene** |
-|---|---|
-| `src/jc_moveit_config` | Configuración de MoveIt 2 escrita a mano: SRDF (grupos `arm`/`gripper`, poses `home`/`ready`/`observe`), `kinematics.yaml` (KDL), OMPL, límites y controladores. |
-| `src/jc_motion` | Nodos C++ sobre `MoveGroupInterface`: `motion_server` (servicios `/jc/move_to_pose`, `/jc/move_to_named`, `/jc/set_gripper`) y `pose_goal_demo`. |
-| `src/jc_bringup` | Lanzadores de la celda: `mock.launch.py` (este documento), `sim.launch.py` (Gazebo, DA-06) y `real.launch.py` (Parte B); mundos y configuración `celda.yaml`. |
+| **Paquete / carpeta** | **Para qué sirve** | **Qué contiene** | **Dónde se usa** |
+|---|---|---|---|
+| `src/jc_moveit_config` | Configuración de MoveIt 2 para planificar movimientos del brazo sin chocar. | SRDF (grupos arm y gripper, poses home, ready y observe), kinematics.yaml (KDL), OMPL, límites de articulaciones y controladores; escrita a mano. | PC (Parte A). En la Parte B también en la Jetson AGX Orin (DA-13). |
+| `src/jc_motion` | Nodos en C++ que mueven el brazo con MoveIt (MoveGroupInterface) y los ofrecen como servicios al resto de la celda. | motion\_server (servicios /jc/move\_to\_pose, /jc/move\_to\_named y /jc/set\_gripper), pose\_goal\_demo y trajectory\_client. | PC (Parte A). En la Parte B también en la Jetson AGX Orin (DA-13). |
+| `src/jc_bringup` | Arranque de la celda completa: un launch por situación (sin hardware, simulación en Gazebo y robot real). | launch/ mock.launch.py (este documento), sim.launch.py (Gazebo, DA-06) y real.launch.py (Parte B); config/celda.yaml; mundos y modelos de Gazebo. | PC (Parte A). En la Parte B también en la Jetson AGX Orin (DA-13). |
 
 **Terminal (PC)**
 

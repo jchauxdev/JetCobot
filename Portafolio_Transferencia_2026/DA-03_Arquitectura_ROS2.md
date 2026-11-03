@@ -106,10 +106,10 @@ TF2 mantiene un árbol de transformaciones entre marcos con marca de tiempo [4].
 
 El espacio de trabajo `~/robots_ws` se construye a medida que avanza la transferencia: cada documento incorpora **solo** el material que usa. Agregue desde el repositorio robots\_ws (DA-02, Paso 7) lo siguiente y revise su contenido antes de ejecutarlo:
 
-| **Se incorpora** | **Qué contiene** |
-|---|---|
-| `src/jc_interfaces` | Mensajes, servicios y acciones propios de la celda (`msg/`, `srv/`, `action/`). Paquete `ament_cmake`: las interfaces se generan en C++ y Python al compilar. |
-| `src/jc_apps` | Nodos didácticos en Python: `talker`, `listener`, `param_demo`, `gripper_service_demo`, `countdown_*`. También trae los nodos que se usan más adelante (cinemática, trayectorias, `pick_place_node`). |
+| **Paquete / carpeta** | **Para qué sirve** | **Qué contiene** | **Dónde se usa** |
+|---|---|---|---|
+| `src/jc_interfaces` | Define los mensajes, servicios y acciones propios de la celda, para que todos los nodos (visión, movimiento, pick and place) se entiendan con los mismos tipos de datos. | msg/ DetectedObject y DetectedObjectArray; srv/ MoveToNamed, MoveToPose y SetGripper; action/ Countdown y PickPlace. Paquete ament\_cmake: genera las interfaces en C++ y Python al compilar. | PC (Parte A). En la Parte B también en la Jetson AGX Orin (DA-13). Lo usan casi todos los demás paquetes (y mr\_cobot\_bridge en la integración con el robot móvil). |
+| `src/jc_apps` | Nodos didácticos en Python para aprender tópicos, servicios, acciones y parámetros; también trae la cinemática, las trayectorias y el pick and place de los DA siguientes. | talker, listener, param\_demo, gripper\_service\_demo, countdown\_server y countdown\_client (DA-03); fk\_check, trajectory\_demo y square\_demo (DA-05, DA-07); pick\_place\_node y launch celda (DA-12); pruebas en test/. | PC (Parte A). En la Parte B también en la Jetson AGX Orin (DA-13). |
 
 **Terminal (PC)**
 
@@ -125,6 +125,9 @@ source install/setup.bash
 tree -L 2 src/
 # paquetes del workspace hasta ahora
 ros2 pkg list | grep -E "jc_|mi_celda"
+# equivalentes de roscd (DA-02, Paso 7.1): ahora ya funcionan
+ros2 pkg prefix jc_interfaces
+colcon_cd jc_interfaces && pwd
 ```
 
 > **Resultado esperado:**
@@ -281,6 +284,12 @@ Agregue en `setup.py` la instalación de la carpeta `launch` (`('share/' + packa
 ### Paso 7. TF2 con el modelo del robot
 
 Este paso necesita el modelo del robot. Incorpore ahora `jc_description` (se estudia a fondo en DA-04) y ejecute las pruebas unitarias de `jc_apps`, que usan ese modelo:
+
+| **Paquete / carpeta** | **Para qué sirve** | **Qué contiene** | **Dónde se usa** |
+|---|---|---|---|
+| `src/jc_description` | Modelo del JetCobot (myCobot 280) en URDF/Xacro: eslabones, articulaciones, límites y pinza. Con él se publican las TF del brazo y se ve en RViz; lo usan MoveIt y Gazebo. | urdf/ jetcobot.urdf.xacro, jetcobot\_macro.xacro, jetcobot.ros2\_control.xacro y jetcobot.gazebo.xacro; config/ros2\_controllers.yaml; launch/display.launch.py; rviz/view.rviz. | PC (Parte A). En la Parte B también en la Jetson AGX Orin (DA-13). Se estudia a fondo en el DA-04. |
+
+Se agrega con estos comandos:
 
 **Terminal (PC)**
 

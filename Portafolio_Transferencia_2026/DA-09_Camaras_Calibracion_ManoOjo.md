@@ -139,9 +139,9 @@ Lecciones: (i) con rotaciones pequeñas la componente a lo largo del eje óptico
 
 El espacio de trabajo `~/robots_ws` se construye a medida que avanza la transferencia: cada documento incorpora **solo** el material que usa. Agregue desde el repositorio robots\_ws (DA-02, Paso 7) lo siguiente y revise su contenido antes de ejecutarlo:
 
-| **Se incorpora** | **Qué contiene** |
-|---|---|
-| `src/jc_vision` | Nodos de visión: `camera_node`, `color_shape_detector`, `aruco_detector`, `yolo_detector`, `handeye_calibration`; utilidades de geometría (`geometry_utils.py`); perfiles HSV y resultados de calibración en `config/`; pruebas unitarias en `test/`. |
+| **Paquete / carpeta** | **Para qué sirve** | **Qué contiene** | **Dónde se usa** |
+|---|---|---|---|
+| `src/jc_vision` | Visión de la celda en ROS 2: publica la imagen, detecta las piezas (color y forma, ArUco, YOLO) y calcula su posición respecto al robot con la calibración mano-ojo. | camera\_node, color\_shape\_detector, aruco\_detector, yolo\_detector y handeye\_calibration; geometry\_utils.py; config/ hsv\_profiles.yaml, camera\_info.yaml y handeye\_result.yaml; pruebas en test/. | PC (Parte A, con cámara USB o simulada). En la Parte B, la Jetson AGX Orin con la cámara conectada. |
 
 **Terminal (PC)**
 

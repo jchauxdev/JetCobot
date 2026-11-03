@@ -211,6 +211,9 @@ source /usr/share/colcon_argcomplete/hook/colcon-argcomplete.bash
 export ROS_DOMAIN_ID=N            # dominio del equipo
 export ROS_LOCALHOST_ONLY=1       # Parte A: solo este PC (en la Parte B se cambia a 0, DA-13)
 [ -f ~/robots_ws/install/setup.bash ] && source ~/robots_ws/install/setup.bash
+# colcon_cd: ir a robots_ws o a un paquete (equivalente de roscd, Paso 7.1)
+source /usr/share/colcon_cd/function/colcon_cd.sh
+export _colcon_cd_root=~/robots_ws
 ```
 
 **Terminal (PC)**
@@ -312,20 +315,16 @@ source install/setup.bash
 
 En ROS 1, roscd llevaba a la carpeta del espacio de trabajo activo. En ROS 2 el espacio de trabajo activo es el que se cargó con source …/install/setup.bash en esa terminal (directamente o desde ~/.bashrc). Para consultarlo y moverse por él:
 
+**Terminal (PC)**
+
 ```bash
-# una sola vez: activar colcon_cd en ~/.bashrc
-echo 'source /usr/share/colcon_cd/function/colcon_cd.sh' >> ~/.bashrc
-echo 'export _colcon_cd_root=~/robots_ws' >> ~/.bashrc
 source ~/.bashrc
 # ¿qué espacios de trabajo están cargados? (vacío = solo /opt/ros/humble)
 printenv COLCON_PREFIX_PATH
 # todas las rutas de paquetes, en orden: overlay primero, /opt/ros/humble al final
 printenv AMENT_PREFIX_PATH | tr ':' '\n'
-# ¿de dónde sale un paquete? (cuando ya esté incorporado, p. ej. jc_interfaces en DA-03)
-ros2 pkg prefix jc_interfaces
-# ir a la raíz del espacio de trabajo (como roscd) o a un paquete (como roscd <paquete>)
-colcon_cd
-colcon_cd jc_interfaces
+# ir a la raíz del espacio de trabajo (como roscd); colcon_cd <paquete> funciona desde el DA-03
+colcon_cd && pwd
 ```
 
 **Resultado esperado:** hoy printenv COLCON\_PREFIX\_PATH muestra /home/&lt;usuario&gt;/robots\_ws/install (el espacio de trabajo vacío ya compilado) y colcon\_cd lleva a ~/robots\_ws; ros2 pkg prefix y colcon\_cd &lt;paquete&gt; funcionarán desde el DA-03, cuando se incorpore el primer paquete. Si COLCON\_PREFIX\_PATH muestra varias carpetas (por ejemplo un espacio de trabajo viejo), deje una sola línea source de espacio de trabajo en ~/.bashrc: si no, ros2 puede usar una copia distinta del paquete que usted edita.

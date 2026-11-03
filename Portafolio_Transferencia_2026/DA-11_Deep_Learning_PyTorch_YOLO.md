@@ -84,9 +84,9 @@ $$AP=\int_{0}^{1} P\left( R \right) dR,  {mAP}_{50-95}=\frac{1}{10 C}\su
 
 Agregue desde el repositorio robots\_ws la carpeta de prácticas de aprendizaje profundo (son scripts, no paquetes de ROS 2):
 
-| **Se incorpora** | **Qué contiene** |
-|---|---|
-| `practicas/dia3_deep_learning` | Scripts de PyTorch/YOLO sin ROS: `dl_00` a `dl_03`, el archivo del dataset `frutas.yaml` y `requirements_dl.txt`. |
+| **Paquete / carpeta** | **Para qué sirve** | **Qué contiene** | **Dónde se usa** |
+|---|---|---|---|
+| `practicas/dia3_deep_learning` | Prácticas de aprendizaje profundo con PyTorch y YOLO sin ROS: detector preentrenado, captura del dataset, clasificador y entrenamiento. No se compilan. | dl\_00\_yolo\_preentrenado.py, dl\_01\_captura\_dataset.py, dl\_02\_clasificador\_transfer.py, dl\_03\_yolo\_entrenar.py, frutas.yaml (dataset) y requirements\_dl.txt. | PC (con GPU, si la hay). En la Parte B el modelo entrenado se ejecuta en la Jetson AGX Orin. |
 
 **Terminal (PC)**
 

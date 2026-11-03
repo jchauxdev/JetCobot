@@ -102,9 +102,9 @@ Para objetos con textura se usan puntos clave con descriptores, p. ej. ORB (bina
 
 Estas prácticas no son paquetes de ROS 2: son scripts de Python que se ejecutan directamente. Agregue la carpeta desde el repositorio robots\_ws:
 
-| **Se incorpora** | **Qué contiene** |
-|---|---|
-| `practicas/dia2_vision` | Scripts de visión con OpenCV sin ROS: `cv_01_adquisicion.py` a `cv_04_caracteristicas.py`, `calibrar_camara.py`, `generar_patrones.py` y el módulo común `comun.py`. |
+| **Paquete / carpeta** | **Para qué sirve** | **Qué contiene** | **Dónde se usa** |
+|---|---|---|---|
+| `practicas/dia2_vision` | Prácticas de visión con OpenCV sin ROS, para aprender adquisición, filtros, segmentación, características y calibración. No se compilan. | cv\_01\_adquisicion.py a cv\_04\_caracteristicas.py, calibrar\_camara.py, generar\_patrones.py y el módulo común comun.py. | PC con la cámara USB. |
 
 **Terminal (PC)**
 

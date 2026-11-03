@@ -82,9 +82,9 @@ Ningún simulador reproduce exactamente fricción, holguras, latencias ni la apa
 
 Los paquetes que usa este documento (`jc_description`, `jc_moveit_config`, `jc_motion`, `jc_bringup`) ya están en su `~/robots_ws`. Solo falta agregar desde el repositorio robots\_ws la carpeta de herramientas:
 
-| **Se incorpora** | **Qué contiene** |
-|---|---|
-| `tools/` | Scripts de apoyo para la simulación (no son paquetes, no se compilan): `fake_detections.py` (detecciones simuladas, Paso 5 de este documento), `synthetic_camera.py` (cámara sintética sin GPU, DA-10) y `handeye_auto.py` (calibración mano-ojo automática en Gazebo, DA-09). |
+| **Paquete / carpeta** | **Para qué sirve** | **Qué contiene** | **Dónde se usa** |
+|---|---|---|---|
+| `tools/` | Scripts de apoyo para la simulación. No son paquetes y no se compilan: se ejecutan con python3. | fake\_detections.py (detecciones simuladas, Paso 5 de este documento), synthetic\_camera.py (cámara sintética sin GPU, DA-10) y handeye\_auto.py (calibración mano-ojo automática en Gazebo, DA-09). | PC. |
 
 **Terminal (PC)**
 

@@ -109,9 +109,9 @@ Aunque el JetCobot es un brazo educativo de baja carga, se aplican los principio
 
 Este es el último paquete del espacio de trabajo y solo se usa en la Jetson, que es el equipo conectado al robot. Agréguelo en la Jetson desde el repositorio robots\_ws (DA-13, Paso 5):
 
-| **Se incorpora** | **Qué contiene** |
-|---|---|
-| `src/jc_driver` | Driver del robot real en Python: `jetcobot_bridge` (ROS 2 ↔ `pymycobot`), `joint_state_follower`, `check_robot` (diagnóstico), configuración del puerto serie y regla udev en `udev/`. |
+| **Paquete / carpeta** | **Para qué sirve** | **Qué contiene** | **Dónde se usa** |
+|---|---|---|---|
+| `src/jc_driver` | Driver del robot real: conecta ROS 2 con el JetCobot por el puerto serie (pymycobot), publica el estado de las articulaciones y ejecuta las trayectorias. | jetcobot\_bridge (ROS 2 ↔ pymycobot), joint\_state\_follower, check\_robot (diagnóstico), config/bridge.yaml, launch y la regla udev en udev/. | Solo la Jetson AGX Orin, conectada al JetCobot por USB. No se agrega en el PC. |
 
 **Terminal (Jetson)**
 
