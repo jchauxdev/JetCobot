@@ -13,3 +13,7 @@ _tmp_revision/
 # Archivos de mas de 100 MB (GitHub no los acepta): imagenes de JetPack y videos
 **/ISO JETPACK/
 Portafolio_Robot_Movil_2026/10. CONFIGURACIÓN ROBOCLAW/MATERIAL DE APOYO/Configuración Roboclaw.mp4
+
+# Solo se publican los .md: los Word y PDF quedan en el equipo
+*.docx
+*.pdf

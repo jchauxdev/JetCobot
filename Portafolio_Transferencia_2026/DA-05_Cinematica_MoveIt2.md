@@ -1,6 +1,6 @@
 # Documento de Apoyo No. DA-05 – Cinemática directa e inversa y planificación de movimientos con MoveIt 2.
 
-> Versión en Markdown del documento [DA-05_Cinematica_MoveIt2.docx](DA-05_Cinematica_MoveIt2.docx) para consultar y copiar comandos desde GitHub. El documento de Word es la versión oficial (formato GFPI-F-135).
+> Versión en Markdown del documento de apoyo, para consultar y copiar comandos desde GitHub. El documento de Word (formato GFPI-F-135) no se publica en el repositorio.
 
 **Nombre del Proyecto Formativo:** CELDA ROBÓTICA COLABORATIVA CON VISIÓN ARTIFICIAL INTEGRADA EN ROS 2 (JETCOBOT – NVIDIA JETSON AGX ORIN)
 

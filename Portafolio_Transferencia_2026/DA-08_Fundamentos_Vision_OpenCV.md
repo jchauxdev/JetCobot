@@ -1,6 +1,6 @@
 # Documento de Apoyo No. DA-08 – Fundamentos de visión artificial con OpenCV: adquisición, preprocesamiento, segmentación y extracción de características.
 
-> Versión en Markdown del documento [DA-08_Fundamentos_Vision_OpenCV.docx](DA-08_Fundamentos_Vision_OpenCV.docx) para consultar y copiar comandos desde GitHub. El documento de Word es la versión oficial (formato GFPI-F-135).
+> Versión en Markdown del documento de apoyo, para consultar y copiar comandos desde GitHub. El documento de Word (formato GFPI-F-135) no se publica en el repositorio.
 
 **Nombre del Proyecto Formativo:** CELDA ROBÓTICA COLABORATIVA CON VISIÓN ARTIFICIAL INTEGRADA EN ROS 2 (JETCOBOT – NVIDIA JETSON AGX ORIN)
 

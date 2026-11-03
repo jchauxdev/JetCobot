@@ -1,6 +1,6 @@
 # Documento de Apoyo No. DA-13 – Jetson AGX Orin: ROS 2 Humble en el computador del robot y ejecución distribuida con el PC.
 
-> Versión en Markdown del documento [DA-13_Jetson_ROS2_Ejecucion_Distribuida.docx](DA-13_Jetson_ROS2_Ejecucion_Distribuida.docx) para consultar y copiar comandos desde GitHub. El documento de Word es la versión oficial (formato GFPI-F-135).
+> Versión en Markdown del documento de apoyo, para consultar y copiar comandos desde GitHub. El documento de Word (formato GFPI-F-135) no se publica en el repositorio.
 
 **Nombre del Proyecto Formativo:** CELDA ROBÓTICA COLABORATIVA CON VISIÓN ARTIFICIAL INTEGRADA EN ROS 2 (JETCOBOT – NVIDIA JETSON AGX ORIN)
 

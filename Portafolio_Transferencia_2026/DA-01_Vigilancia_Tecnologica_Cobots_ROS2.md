@@ -1,6 +1,6 @@
 # Documento de Apoyo No. DA-01 – Vigilancia tecnológica y estado del arte: cobots, visión artificial y ROS 2 en la industria.
 
-> Versión en Markdown del documento [DA-01_Vigilancia_Tecnologica_Cobots_ROS2.docx](DA-01_Vigilancia_Tecnologica_Cobots_ROS2.docx) para consultar y copiar comandos desde GitHub. El documento de Word es la versión oficial (formato GFPI-F-135).
+> Versión en Markdown del documento de apoyo, para consultar y copiar comandos desde GitHub. El documento de Word (formato GFPI-F-135) no se publica en el repositorio.
 
 **Nombre del Proyecto Formativo:** CELDA ROBÓTICA COLABORATIVA CON VISIÓN ARTIFICIAL INTEGRADA EN ROS 2 (JETCOBOT – NVIDIA JETSON AGX ORIN)
 

@@ -1,6 +1,6 @@
 # Documento de Apoyo No. DA-02 – Entorno de desarrollo ROS 2 Humble en el PC.
 
-> Versión en Markdown del documento [DA-02_Entorno_ROS2_Humble_PC.docx](DA-02_Entorno_ROS2_Humble_PC.docx) para consultar y copiar comandos desde GitHub. El documento de Word es la versión oficial (formato GFPI-F-135).
+> Versión en Markdown del documento de apoyo, para consultar y copiar comandos desde GitHub. El documento de Word (formato GFPI-F-135) no se publica en el repositorio.
 
 **Nombre del Proyecto Formativo:** CELDA ROBÓTICA COLABORATIVA CON VISIÓN ARTIFICIAL INTEGRADA EN ROS 2 (JETCOBOT – NVIDIA JETSON AGX ORIN)
 

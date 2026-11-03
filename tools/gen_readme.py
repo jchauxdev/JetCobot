@@ -24,7 +24,7 @@ L.append('# JetCobot – Transferencias de conocimiento SENA 2026 (ROS 2 Humble)
 L.append('Material de dos transferencias de conocimiento del SENA, diseñadas por Julián René Cháux Cedeño:\n')
 L.append('1. **Celda robótica colaborativa con visión artificial**: JetCobot (myCobot 280) con ROS 2 Humble, MoveIt 2, Gazebo y OpenCV/YOLO, de la simulación en el PC al robot real con una NVIDIA Jetson AGX Orin.')
 L.append('2. **Robot móvil autónomo de tracción diferencial**: construcción, RoboClaw, ROS 2 Humble en Jetson (Nano, Orin Nano, AGX Orin) o Raspberry Pi, lidar, cámaras, SLAM, Nav2 e integración con la celda del cobot mediante una App web de logística.\n')
-L.append('Cada documento de apoyo (DA) está en dos formatos: **`.docx`** (versión oficial, formato GFPI-F-135) y **`.md`**, que se lee directamente en GitHub y permite **copiar y pegar los comandos**. En los bloques de comandos el encabezado indica dónde se ejecutan: **Terminal – PC**, **Terminal – robot** (Jetson o Raspberry Pi) o ambos.\n')
+L.append('Cada documento de apoyo (DA) se publica en **`.md`**, que se lee directamente en GitHub y permite **copiar y pegar los comandos**. Los `.docx` (versión oficial, formato GFPI-F-135) y los `.pdf` no se suben al repositorio. En los bloques de comandos el encabezado indica dónde se ejecutan: **Terminal – PC**, **Terminal – robot** (Jetson o Raspberry Pi) o ambos.\n')
 L.append('## Contenido del repositorio\n')
 L.append('Los paquetes ROS 2 (`mr_*` y `jc_*`) están en el repositorio aparte [jchauxdev/robots_ws](https://github.com/jchauxdev/robots_ws).\n')
 L.append('| Carpeta / archivo | Contenido |\n|---|---|')
@@ -53,13 +53,13 @@ L.append('Para saber qué espacio de trabajo está activo en una terminal (equiv
 for port, name in (('Portafolio_Transferencia_2026', 'Transferencia 1 – Celda robótica colaborativa (JetCobot)'),
                    ('Portafolio_Robot_Movil_2026', 'Transferencia 2 – Robot móvil autónomo')):
     L.append(f'## {name}\n')
-    L.append('| Documento | Markdown (copiar comandos) | Word |\n|---|---|---|')
+    L.append('| Documento | Markdown (copiar comandos) |\n|---|---|')
     for md, docx in docs(port):
         b = os.path.basename(md)[:-3]
         sub = os.path.relpath(os.path.dirname(md), port)
         t = title(md)
         if b.startswith('Guia'): t = 'Guía de aprendizaje'
-        L.append(f'| {t} | {link(md, b + ".md")} | {link(docx, "docx")} |')
+        L.append(f'| {t} | {link(md, b + ".md")} |')
     L.append('')
 L.append('## Actualizar los `.md` después de editar un `.docx`\n')
 L.append('Los `.md` se generan a partir de los `.docx`. Después de modificar un documento en Word, regenérelos desde la carpeta del repositorio (requiere Python 3 con `lxml` y `Pillow`):\n')

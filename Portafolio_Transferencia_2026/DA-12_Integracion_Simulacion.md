@@ -1,6 +1,6 @@
 # Documento de Apoyo No. DA-12 – Práctica: integración visión–cobot en la celda simulada y planteamiento del proyecto final.
 
-> Versión en Markdown del documento [DA-12_Integracion_Simulacion.docx](DA-12_Integracion_Simulacion.docx) para consultar y copiar comandos desde GitHub. El documento de Word es la versión oficial (formato GFPI-F-135).
+> Versión en Markdown del documento de apoyo, para consultar y copiar comandos desde GitHub. El documento de Word (formato GFPI-F-135) no se publica en el repositorio.
 
 **Nombre del Proyecto Formativo:** CELDA ROBÓTICA COLABORATIVA CON VISIÓN ARTIFICIAL INTEGRADA EN ROS 2 (JETCOBOT – NVIDIA JETSON AGX ORIN)
 

@@ -273,8 +273,8 @@ class Conv:
         txt = '\n'.join(s.out)
         txt = re.sub(r'(\n *(?:-|\d+\.) [^\n]*)\n(?=[^\s\n])(?! *(?:-|\d+\.) )', r'\1\n\n', txt)
         txt = re.sub(r'\n{3,}', '\n\n', txt).strip() + '\n'
-        aviso = (f'> Versión en Markdown del documento [{s.base}]({s.base.replace(" ", "%20")}) para consultar y copiar '
-                 'comandos desde GitHub. El documento de Word es la versión oficial (formato GFPI-F-135).\n\n')
+        aviso = ('> Versión en Markdown del documento de apoyo, para consultar y copiar comandos desde GitHub. '
+                 'El documento de Word (formato GFPI-F-135) no se publica en el repositorio.\n\n')
         i = txt.find('\n')
         txt = txt[:i + 1] + '\n' + aviso + txt[i + 1:].lstrip('\n') if txt.startswith('# ') else aviso + txt
         mdp = os.path.splitext(s.path)[0] + '.md'

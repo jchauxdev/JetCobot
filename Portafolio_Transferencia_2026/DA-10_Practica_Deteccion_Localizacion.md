@@ -1,6 +1,6 @@
 # Documento de Apoyo No. DA-10 – Práctica: detección y localización de objetos (color, forma y marcadores ArUco) en la celda simulada, publicando sus posiciones en tópicos ROS 2.
 
-> Versión en Markdown del documento [DA-10_Practica_Deteccion_Localizacion.docx](DA-10_Practica_Deteccion_Localizacion.docx) para consultar y copiar comandos desde GitHub. El documento de Word es la versión oficial (formato GFPI-F-135).
+> Versión en Markdown del documento de apoyo, para consultar y copiar comandos desde GitHub. El documento de Word (formato GFPI-F-135) no se publica en el repositorio.
 
 **Nombre del Proyecto Formativo:** CELDA ROBÓTICA COLABORATIVA CON VISIÓN ARTIFICIAL INTEGRADA EN ROS 2 (JETCOBOT – NVIDIA JETSON AGX ORIN)
 

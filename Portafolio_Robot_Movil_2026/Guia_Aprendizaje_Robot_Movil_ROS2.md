@@ -1,6 +1,6 @@
 # FORMATO GUÍA DE APRENDIZAJE
 
-> Versión en Markdown del documento [Guia_Aprendizaje_Robot_Movil_ROS2.docx](Guia_Aprendizaje_Robot_Movil_ROS2.docx) para consultar y copiar comandos desde GitHub. El documento de Word es la versión oficial (formato GFPI-F-135).
+> Versión en Markdown del documento de apoyo, para consultar y copiar comandos desde GitHub. El documento de Word (formato GFPI-F-135) no se publica en el repositorio.
 
 ## 1. IDENTIFICACIÓN DE LA GUIA DE APRENDIZAJE
 

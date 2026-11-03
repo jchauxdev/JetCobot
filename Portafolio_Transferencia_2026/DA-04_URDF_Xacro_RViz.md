@@ -1,6 +1,6 @@
 # Documento de Apoyo No. DA-04 – Modelado del cobot con URDF/Xacro y visualización en RViz2.
 
-> Versión en Markdown del documento [DA-04_URDF_Xacro_RViz.docx](DA-04_URDF_Xacro_RViz.docx) para consultar y copiar comandos desde GitHub. El documento de Word es la versión oficial (formato GFPI-F-135).
+> Versión en Markdown del documento de apoyo, para consultar y copiar comandos desde GitHub. El documento de Word (formato GFPI-F-135) no se publica en el repositorio.
 
 **Nombre del Proyecto Formativo:** CELDA ROBÓTICA COLABORATIVA CON VISIÓN ARTIFICIAL INTEGRADA EN ROS 2 (JETCOBOT – NVIDIA JETSON AGX ORIN)
 
