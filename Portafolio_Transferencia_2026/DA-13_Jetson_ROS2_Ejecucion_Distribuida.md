@@ -2,10 +2,6 @@
 
 > Versión en Markdown del documento de apoyo, para consultar y copiar comandos desde GitHub. El documento de Word (formato GFPI-F-135) no se publica en el repositorio.
 
-**Nombre del Proyecto Formativo:** CELDA ROBÓTICA COLABORATIVA CON VISIÓN ARTIFICIAL INTEGRADA EN ROS 2 (JETCOBOT – NVIDIA JETSON AGX ORIN)
-
-**Actividad de Proyecto Formativo:** IMPLEMENTAR UNA CELDA ROBÓTICA COLABORATIVA CON VISIÓN ARTIFICIAL Y ROS 2, DE LA SIMULACIÓN AL ROBOT REAL, Y TRANSFERIR EL CONOCIMIENTO AL CENTRO DE FORMACIÓN.
-
 **Actividad de Aprendizaje:** Preparar la NVIDIA Jetson AGX Orin como computador del robot (ROS 2 Humble, espacio de trabajo, red y acceso remoto) y verificar la ejecución distribuida Jetson–PC antes de conectar el cobot.
 
 **Parte de la transferencia:** Parte B – Robot real con la Jetson AGX Orin.
