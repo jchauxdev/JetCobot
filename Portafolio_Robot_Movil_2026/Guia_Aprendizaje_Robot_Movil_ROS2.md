@@ -51,8 +51,8 @@ Agenda de la semana:
 
 | **Día / fecha** | **Mañana** | **Tarde** | **Documentos de apoyo** |
 |---|---|---|---|
-| Día 2<br>03/11/2026 | Reflexión y diagnóstico; construcción del robot; configuración del RoboClaw (Motion Studio, PID) | Linux y ROS 2 en Jetson Nano (Docker) / AGX Orin; SSH y VNC; red local y red ROS 2; arranque automático | 8.1, 9.1, 10.1, 11.x, 13.x |
-| Día 3<br>04/11/2026 | Driver ROS 2 del RoboClaw; calibración de la odometría (prueba de 1 m y 360°); reglas udev | Modelo URDF y RViz2; cámara RGB; RPLidar y TF | 12.1–12.3, 14.1, 15.1, 16.1 |
+| Día 2<br>03/11/2026 | Reflexión y diagnóstico; construcción del robot; configuración del RoboClaw (Motion Studio, PID) | Linux y ROS 2 en el computador del robot: Jetson Nano (Docker), Orin Nano, AGX Orin o Raspberry Pi; SSH y VNC | 8.1, 9.1, 10.1, 11.x |
+| Día 3<br>04/11/2026 | Driver ROS 2 del RoboClaw; calibración de la odometría (prueba de 1 m y 360°); reglas udev | Red local y red ROS 2; arranque automático; modelo URDF y RViz2; cámara RGB; RPLidar y TF | 12.1–12.3, 13.1–13.3, 14.1, 15.1, 16.1 |
 | Día 4<br>05/11/2026 | Mapeo con slam\_toolbox | Nav2; estaciones con nombre y «ir a X»; teleoperación; RealSense D435i | 17.1, 18.1, 18.2, 19.1, 20.1 |
 | Día 5<br>06/11/2026 | Integración robot móvil – cobot con la App de logística | Pruebas, sustentación, evaluación y plan de transferencia | 21.1 |
 
@@ -158,31 +158,29 @@ Se ensambla y cablea la plataforma y se configura el lazo de velocidad del RoboC
 
 **Materiales de formación:** Kit del robot, herramientas, multímetro, PC Windows con Motion Studio, PC con Ubuntu 22.04 y ROS 2 Humble, robots\_ws (reserva mr\_ws).
 
-**Material de apoyo: 8.1, 9.1, 10.1.**
+**Material de apoyo:** 8.1, 9.1, 10.1.
 
 **Duración de la actividad:** 4 horas (Día 2).
 
-**3.3.2 Linux, ROS 2 y comunicaciones del robot.**
+**3.3.2 Linux y ROS 2 en el computador del robot.**
 
-Se prepara el computador del robot y la comunicación ROS 2 con el PC.
+Se prepara el computador del robot con Ubuntu, ROS 2 y acceso remoto desde el PC.
 
 **Descripción de la actividad:**
 
 1. Instalar JetPack 4.6.6 y el contenedor ROS 2 Humble en la Nano, o los paquetes del robot en la AGX Orin.
 1. Verificar la instalación de ROS 2 con printenv ROS\_DISTRO (debe mostrar humble) y printenv ROS\_VERSION (2); en la Nano, dentro del contenedor.
 1. Configurar SSH (y VNC si se requiere); considerar la limitación de VS Code Remote-SSH en Ubuntu 18.04.
-1. Asignar IP fija, ROS\_DOMAIN\_ID y probar talker/listener y turtlesim entre el robot y el PC.
-1. Configurar el arranque automático de los drivers con systemd.
 
 **Ambiente requerido:** Ambiente de aprendizaje tipo aula-laboratorio tecnológico. Para garantizar el bienestar integral de los aprendices e instructores, este espacio debe operar bajo estrictos estándares de seguridad industrial, salud ocupacional y medio ambiente. Esto exige la implementación de condiciones ergonómicas óptimas en el mobiliario para mitigar el riesgo biomecánico, iluminación y climatización adecuadas, señalización clara de rutas de evacuación y disposición de equipos de emergencia. Adicionalmente: laboratorio de robótica con un robot móvil diferencial por equipo (RoboClaw 2x15A, Jetson Nano o Jetson AGX Orin, RPLidar A1, cámara RGB y RealSense D435i), área de pruebas despejada de al menos 6 × 4 m con obstáculos móviles, banco de electrónica con multímetro y fuente, celda del JetCobot, red Wi-Fi del laboratorio sin aislamiento de clientes y acceso a Internet para la instalación de paquetes.
 
 **Estrategias o técnicas didácticas activas:** Demostración guiada, práctica dirigida.
 
-**Materiales de formación:** Jetson, PC Ubuntu 22.04, red ROBOTS, mr\_ws.
+**Materiales de formación:** Jetson o Raspberry Pi, PC Ubuntu 22.04, robots\_ws (reserva mr\_ws).
 
-**Material de apoyo:** 11.x, 13.1–13.3.
+**Material de apoyo:** 11.x.
 
-**Duración de la actividad:** 2,5 horas (Día 2).
+**Duración de la actividad:** 2 horas (Día 2).
 
 **3.3.3 Driver ROS 2 del RoboClaw y calibración de la odometría.**
 
@@ -205,12 +203,14 @@ Se comanda el robot con cmd\_vel, se obtiene su odometría y se calibra hasta cu
 
 **Duración de la actividad:** 4 horas (Día 3).
 
-**3.3.4 Modelo del robot y sensores en ROS 2.**
+**3.3.4 Red ROS 2, modelo del robot y sensores.**
 
-Se integra el modelo URDF con el árbol TF y se publican la cámara y el lidar.
+Se configura la comunicación ROS 2 entre el robot y el PC, se integra el modelo URDF con el árbol TF y se publican la cámara y el lidar.
 
 **Descripción de la actividad:**
 
+1. Asignar IP fija, ROS\_DOMAIN\_ID y probar talker/listener y turtlesim entre el robot y el PC.
+1. Configurar el arranque automático de los drivers con systemd.
 1. Visualizar `mr_description` en RViz2 y ajustar sus medidas.
 1. Publicar la cámara (OpenCV o usb\_cam) y medir FPS y ancho de banda por Wi-Fi.
 1. Lanzar el RPLidar, verificar la orientación del haz y la TF `base_footprint → laser`.
@@ -219,11 +219,11 @@ Se integra el modelo URDF con el árbol TF y se publican la cámara y el lidar.
 
 **Estrategias o técnicas didácticas activas:** Práctica dirigida, verificación experimental.
 
-**Materiales de formación:** Robot con sensores, PC, mr\_ws.
+**Materiales de formación:** Robot con sensores, PC, red ROBOTS, robots\_ws (reserva mr\_ws).
 
-**Material de apoyo:** 14.1, 15.1, 16.1.
+**Material de apoyo:** 13.1–13.3, 14.1, 15.1, 16.1.
 
-**Duración de la actividad:** 3,5 horas (Día 3).
+**Duración de la actividad:** 4 horas (Día 3).
 
 **3.3.5 Mapeo, navegación autónoma y estaciones con nombre.**
 
