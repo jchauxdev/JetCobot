@@ -189,9 +189,20 @@ sudo apt install -y \
 
 ### Paso 5. Configurar el entorno de la terminal
 
-Agregue al final de `~/.bashrc` (reemplace `N` por el número de su equipo, de 1 a 30):
+Abra el archivo ~/.bashrc con un editor de texto y agregue al final (reemplace `N` por el número de su equipo, de 1 a 30):
 
-**~/.bashrc (PC)**
+**Terminal (PC)**
+
+```bash
+# en el escritorio (si no está instalado: sudo apt install gedit)
+gedit ~/.bashrc
+# por SSH o sin escritorio
+nano ~/.bashrc
+```
+
+Pegue al final del archivo las líneas del recuadro siguiente (solo las que no tenga ya), guarde (Ctrl + S en gedit; Ctrl + O, Enter y Ctrl + X en nano) y cierre el editor. Estas líneas no se escriben en la terminal: se cargan solas en cada terminal nueva.
+
+**Contenido para ~/.bashrc (PC) – se pega en el editor, no en la terminal**
 
 ```bash
 # --- ROS 2 Humble - Celda JetCobot (Parte A: simulacion en el PC) ---

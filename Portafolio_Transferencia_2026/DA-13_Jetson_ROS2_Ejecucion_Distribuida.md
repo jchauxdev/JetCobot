@@ -158,9 +158,20 @@ Si `printenv ROS_DISTRO` no muestra nada, el entorno no está cargado: verifique
 
 ### Paso 4. Configurar el entorno para trabajar en red
 
-En la Parte B la Jetson y el PC deben verse en la red. Agregue al final de `~/.bashrc` de la **Jetson** y **modifique** el del **PC** (en la Parte A tenía `ROS_LOCALHOST_ONLY=1`). Use el **mismo** `N` en ambos:
+En la Parte B la Jetson y el PC deben verse en la red. Abra con un editor de texto el ~/.bashrc de la **Jetson**, agregue al final las líneas siguientes, y modifique el del **PC** (en la Parte A tenía `ROS_LOCALHOST_ONLY=1`). Use el **mismo** `N` en ambos:
 
-**~/.bashrc (Jetson y PC)**
+**Terminal (Jetson y PC)**
+
+```bash
+# en el escritorio (si no está instalado: sudo apt install gedit)
+gedit ~/.bashrc
+# por SSH o sin escritorio
+nano ~/.bashrc
+```
+
+Pegue al final del archivo las líneas del recuadro siguiente (solo las que no tenga ya), guarde (Ctrl + S en gedit; Ctrl + O, Enter y Ctrl + X en nano) y cierre el editor. Estas líneas no se escriben en la terminal: se cargan solas en cada terminal nueva.
+
+**Contenido para ~/.bashrc (Jetson y PC) – se pega en el editor, no en la terminal**
 
 ```bash
 # --- ROS 2 Humble - Celda JetCobot (Parte B) ---
