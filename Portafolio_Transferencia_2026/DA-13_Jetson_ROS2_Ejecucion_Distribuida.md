@@ -88,6 +88,10 @@ Los nodos que tocan hardware o tienen requisitos de tiempo (driver, cámara, Mov
 
 ## 4. PROCEDIMIENTO PASO A PASO
 
+> **Primera conexión sin monitor:**
+>
+> La AGX Orin no trae usuario ni contraseña por defecto: se crean en la configuración inicial (oem-config) del primer arranque. Sin monitor, conecte al PC el USB-C que está junto al conector de 40 pines y haga esa configuración por la consola serie (`sudo screen /dev/ttyACM0 115200`; en Windows, PuTTY a 115200 baudios). Luego entre por el mismo cable con `ssh usuario@192.168.55.1` (por USB la Jetson siempre tiene esa dirección), conéctela a la red con `sudo nmcli device wifi connect "RED" password "CLAVE"` y use en adelante la IP que muestra `hostname -I`. Desde ese momento, los bloques «Terminal (Jetson)» se ejecutan por SSH. Si el PC ya se había conectado a otra Jetson por 192.168.55.1, SSH rechaza la conexión con `REMOTE HOST IDENTIFICATION HAS CHANGED!`: borre la huella anterior con `ssh-keygen -R 192.168.55.1` y vuelva a conectarse.
+
 ### Paso 1. Verificar la versión del sistema en la Jetson
 
 **Terminal (Jetson)**
