@@ -12,8 +12,7 @@ Autor: Julian Rene Chaux Cedeno - SENA
   14. Modelo URDF y RViz2         15. Camara web          16. Lidar
   17. Generacion del mapa         18. Nav2 y puntos con nombre
   19. Teleoperacion               20. RealSense D435i     21. Integracion robot movil - cobot
-- Espacio de trabajo: ~/robots_ws se construye paso a paso (DA-9.1). Cada documento, en su Paso 0,
-  copia desde la reserva solo los paquetes que usa.
-- mr_ws.zip: material de reserva con todo el codigo (tambien en 12/REPOSITORIOS y en el repositorio
-  https://github.com/jchauxdev/JetCobot, carpeta Portafolio_Robot_Movil_2026). Se descomprime en ~/mr_reserva.
+- Espacio de trabajo: ~/robots_ws es el repositorio https://github.com/jchauxdev/robots_ws (paquetes mr_* y jc_*).
+  Se clona vacio (DA-9.1) y cada documento, en su Paso 0, agrega solo los paquetes que usa con
+  "git sparse-checkout add". Las correcciones del instructor se reciben con "git pull".
 - Jetson Nano: JetPack 4.6.6 (DA-11.1); la imagen de la tarjeta no se incluye por su tamano.

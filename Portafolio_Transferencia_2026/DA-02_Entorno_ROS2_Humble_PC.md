@@ -29,7 +29,7 @@ Trabajo en equipos de dos o tres participantes. Cada equipo dispone de un comput
 - Justificar técnicamente la elección de ROS 2 Humble y Ubuntu 22.04 para la celda.
 - Instalar ROS 2 Humble desde los repositorios oficiales siguiendo el procedimiento vigente (paquete `ros2-apt-source`).
 - Instalar los paquetes de la transferencia: ros2\_control, MoveIt 2, Gazebo Fortress (`ros_gz`), cv\_bridge y calibración de cámara.
-- Crear el espacio de trabajo robots\_ws (vacío, se construye paso a paso en los documentos siguientes) y dejar el material completo de reserva en `~/jc_reserva`.
+- Crear el espacio de trabajo robots\_ws (vacío, se construye paso a paso en los documentos siguientes) clonándolo desde GitHub (vacío; los paquetes se agregan en cada documento).
 - Verificar la instalación con pruebas objetivas (`printenv`, demo talker/listener, `ros2 doctor`).
 
 ## 2. FUNDAMENTOS Y DECISIONES DE PLATAFORMA
@@ -53,13 +53,13 @@ Se usa Humble en el PC porque es la misma distribución que correrá en la Jetso
 
 Como los nodos usan las mismas interfaces ROS 2 en simulación y con el robot real, el paso de la Parte A a la Parte B no exige reescribir el código: solo cambia el lanzador y el equipo donde se ejecutan los nodos.
 
-### 2.3 Material de software de la transferencia (espacio de trabajo jc_ws)
+### 2.3 Material de software de la transferencia (repositorio robots_ws)
 
-Para que todas las prácticas sean reproducibles se entrega el espacio de trabajo **jc\_ws** [7], con prefijo `jc_` en los paquetes para no colisionar con los paquetes `jetcobot_*` de la imagen de Yahboom. Todos los paquetes fueron compilados y probados en ROS 2 Humble con MoveIt 2.5.9 y Gazebo Fortress (ver DA-17, sección de validación).
+Para que todas las prácticas sean reproducibles se entregan los paquetes del repositorio robots\_ws [7], con prefijo `jc_` en los paquetes para no colisionar con los paquetes `jetcobot_*` de la imagen de Yahboom. Todos los paquetes fueron compilados y probados en ROS 2 Humble con MoveIt 2.5.9 y Gazebo Fortress (ver DA-17, sección de validación).
 
-El espacio de trabajo **no se copia completo al inicio**: se entrega comprimido (`jc_ws.zip`) y se descomprime como **reserva** en `~/jc_reserva`. El `~/robots_ws` de cada equipo empieza vacío y cada documento de apoyo, en su **Paso 0**, incorpora solo los paquetes que va a usar, los compila y los explora. Así cada paquete se entiende cuando se necesita, y la reserva sirve para comparar o restaurar un archivo que se haya dañado. La última columna de la Tabla 2 indica en qué documento se incorpora cada paquete.
+El espacio de trabajo no se copia completo al inicio: se clona vacío desde el repositorio https://github.com/jchauxdev/robots\_ws en ~/robots\_ws y cada documento de apoyo, en su **Paso 0**, incorpora solo los paquetes que va a usar, los compila y los explora. Así cada paquete se entiende cuando se necesita, y git restaura un archivo dañado con git checkout -- &lt;archivo&gt;; git pull trae las correcciones del instructor. La última columna de la Tabla 2 indica en qué documento se incorpora cada paquete.
 
-*Tabla 2. Paquetes del espacio de trabajo jc_ws entregado con este portafolio.*
+*Tabla 2. Paquetes jc_\* del repositorio robots_ws.*
 
 | **Paquete** | **Tipo** | **Contenido principal** | **Se incorpora en** |
 |---|---|---|---|
@@ -77,7 +77,7 @@ El espacio de trabajo **no se copia completo al inicio**: se entrega comprimido 
 ## 3. MATERIALES Y REQUISITOS PREVIOS
 
 - PC con Ubuntu 22.04 (nativo; se desaconseja máquina virtual para Gazebo por el rendimiento gráfico) y GPU con OpenGL ≥ 3.3 recomendada para Gazebo y RViz2.
-- Acceso a Internet para descargar el archivo `jc_ws.zip` del repositorio del curso, https://github.com/jchauxdev/JetCobot (carpeta `Portafolio_Transferencia_2026`).
+- Acceso a Internet para clonar el repositorio de paquetes del curso, https://github.com/jchauxdev/robots\_ws.
 - Usuario con permisos `sudo` y conexión a Internet. Tiempo estimado de descarga: 2–4 GB.
 
 > **Nota:**
@@ -268,25 +268,22 @@ sudo rosdep init
 rosdep update
 ```
 
-### Paso 7. Crear el espacio de trabajo robots_ws y dejar la reserva
+### Paso 7. Clonar el espacio de trabajo robots_ws
 
 Un *workspace* es una carpeta con subcarpeta `src` que contiene paquetes. `colcon` compila cada paquete y genera `build/`, `install/` y `log/`. Al hacer `source install/setup.bash`, el workspace se **superpone** (*overlay*) a la instalación base `/opt/ros/humble` (*underlay*): si un paquete existe en ambos, prevalece el del overlay.
 
-Primero descargue del repositorio del curso **solo** el archivo `jc_ws.zip` (no hace falta clonar todo el repositorio). Luego descomprímalo como reserva, **fuera** del workspace, e instale de una vez todas las dependencias que declaran sus paquetes (así no hay que volver a usar `rosdep` en cada documento):
+Primero clone el repositorio de paquetes del curso, https://github.com/jchauxdev/robots\_ws, en ~/robots\_ws. Con la opción --sparse solo se descarga la carpeta principal, sin paquetes: cada documento de apoyo agrega, en su Paso 0, los paquetes que usa con git sparse-checkout add (e instala sus dependencias con rosdep), y git pull trae las correcciones del instructor:
 
 **Terminal (PC)**
 
 ```bash
-mkdir -p ~/jc_reserva && cd ~/jc_reserva
-REPO=https://raw.githubusercontent.com/jchauxdev/JetCobot/main
-wget $REPO/Portafolio_Transferencia_2026/jc_ws.zip
-unzip jc_ws.zip
-# README.md  practicas  src  tools
-ls ~/jc_reserva/jc_ws
-rosdep install --from-paths ~/jc_reserva/jc_ws/src --ignore-src -r -y
+sudo apt install -y git
+git clone --filter=blob:none --sparse https://github.com/jchauxdev/robots_ws.git ~/robots_ws
+# README.md (los paquetes se agregan en cada documento)
+ls ~/robots_ws
 ```
 
-Luego cree el workspace del equipo, **vacío**, y compílelo para comprobar que `colcon` funciona:
+Luego cree la carpeta src y compile el espacio de trabajo, todavía vacío, para comprobar que colcon funciona:
 
 **Terminal (PC)**
 
@@ -305,7 +302,7 @@ source install/setup.bash
 
 > **Precaución:**
 >
-> No compile dentro de `~/jc_reserva` ni la agregue a `~/.bashrc`: es solo una copia de consulta. Si dos copias del mismo paquete quedan en el entorno, el *overlay* puede ocultar la que usted está editando. Para restaurar un archivo: `cp ~/jc_reserva/jc_ws/src/<paquete>/<archivo> ~/robots_ws/src/<paquete>/<archivo>`.
+> No copie paquetes a mano dentro de ~/robots\_ws/src: agréguelos con git sparse-checkout add para que git pull los mantenga al día. Sus propios paquetes (por ejemplo mi\_celda) sí se crean directamente en src/.
 
 ![imagen](md_img/DA_02_Entorno_ROS2_Humble_PC_01.jpg)
 
@@ -333,32 +330,20 @@ colcon_cd jc_interfaces
 
 **Resultado esperado:** hoy printenv COLCON\_PREFIX\_PATH muestra /home/&lt;usuario&gt;/robots\_ws/install (el espacio de trabajo vacío ya compilado) y colcon\_cd lleva a ~/robots\_ws; ros2 pkg prefix y colcon\_cd &lt;paquete&gt; funcionarán desde el DA-03, cuando se incorpore el primer paquete. Si COLCON\_PREFIX\_PATH muestra varias carpetas (por ejemplo un espacio de trabajo viejo), deje una sola línea source de espacio de trabajo en ~/.bashrc: si no, ros2 puede usar una copia distinta del paquete que usted edita.
 
-### Paso 7.2. Actualizar la reserva cuando cambie el material
+### Paso 7.2. Recibir las correcciones del instructor
 
-La reserva es una ayuda: de ella salen los paquetes que cada documento copia en su Paso 0, y sirve para comparar o restaurar un archivo. Usted trabaja siempre en `~/robots_ws`. Si el instructor publica una versión nueva de `jc_ws.zip` (corrección o mejora), el archivo `CAMBIOS.md` de la reserva dice qué cambió. Para actualizar:
+Cuando el instructor corrige o mejora un paquete, lo sube al repositorio robots\_ws en GitHub. Cada equipo lo recibe así:
 
-**Terminal (PC)**
+**Terminal (PC; en la Parte B también en la Jetson)**
 
 ```bash
-# 1. guardar la reserva anterior y descargar la nueva
-mv ~/jc_reserva ~/jc_reserva_anterior
-mkdir -p ~/jc_reserva && cd ~/jc_reserva
-REPO=https://raw.githubusercontent.com/jchauxdev/JetCobot/main
-wget $REPO/Portafolio_Transferencia_2026/jc_ws.zip && unzip jc_ws.zip
-cat ~/jc_reserva/jc_ws/CAMBIOS.md
-# 2. comparar un paquete que ya incorporó con su versión nueva
-diff -rq ~/jc_reserva/jc_ws/src/jc_apps ~/robots_ws/src/jc_apps
-# 3a. traer solo un archivo que cambió (conserva sus demás cambios)
-cp ~/jc_reserva/jc_ws/src/jc_apps/<ruta/archivo> ~/robots_ws/src/jc_apps/<ruta/archivo>
-# 3b. o reemplazar el paquete completo (se pierden sus cambios en ese paquete)
-rm -rf ~/robots_ws/src/jc_apps && cp -r ~/jc_reserva/jc_ws/src/jc_apps ~/robots_ws/src/
-# 4. si CAMBIOS.md menciona dependencias nuevas, instalarlas
-rosdep install --from-paths ~/jc_reserva/jc_ws/src --ignore-src -r -y
-# 5. recompilar el paquete actualizado
-cd ~/robots_ws && colcon build --symlink-install --packages-select jc_apps && source install/setup.bash
+cd ~/robots_ws
+git pull
+colcon build --symlink-install
+source install/setup.bash
 ```
 
-Los paquetes que todavía no ha incorporado no requieren nada: el Paso 0 del documento correspondiente los copiará ya desde la reserva nueva. Cuando todo funcione, puede borrar `~/jc_reserva_anterior`.
+Si `git pull` avisa que sus cambios locales se sobrescribirían, guárdelos con `git stash`, ejecute `git pull` y recupérelos con `git stash pop`. Para ver qué cambió: `git log --oneline -5`.
 
 ### Paso 8. Verificar la instalación
 
@@ -390,7 +375,7 @@ Las pruebas unitarias del material se ejecutan cuando se incorpora cada paquete:
 | 1 | Ubuntu 22.04 y OpenGL ≥ 3.3 confirmados en el PC | Salida del Paso 1 |  |
 | 2 | ROS 2 Humble instalado; `ROS_DISTRO=humble` | Salida de `printenv ROS_DISTRO` y `ROS_VERSION` (Paso 3.1) |  |
 | 3 | Paquetes de la transferencia instalados | `ros2 pkg list \| grep -E "moveit_ros_move_group\|ros_gz_sim\|ign_ros2_control"` |  |
-| 4 | Reserva descomprimida en `~/jc_reserva` y dependencias instaladas con `rosdep` | `ls ~/jc_reserva/jc_ws` |  |
+| 4 | robots\_ws clonado desde GitHub | `git -C ~/robots_ws remote -v` |  |
 | 5 | Workspace `~/robots_ws` vacío creado y compilado (0 paquetes) | Captura de `colcon build` |  |
 | 6 | Talker y listener se comunican en el PC | Captura de ambas terminales |  |
 
@@ -403,7 +388,7 @@ Las pruebas unitarias del material se ejecutan cuando se incorpora cada paquete:
 | `E: Unable to locate package ros-humble-...` | Repositorio no configurado o sistema no es 22.04 | Repita el Paso 2; verifique `lsb_release -a`. |
 | `ros2: command not found` | No se cargó el entorno | `source /opt/ros/humble/setup.bash` (o revise `~/.bashrc`). |
 | `wget` responde `404 Not Found` | URL mal escrita (distingue mayúsculas y minúsculas) | Copie la URL exacta del Paso 7; verifique en el navegador que el archivo existe. |
-| `unzip: cannot find or open jc_ws.zip` | No se ejecutó `unzip` dentro de `~/jc_reserva` | `cd ~/jc_reserva && ls` debe mostrar `jc_ws.zip`; si no está, repita el `wget`. |
+| `fatal: destination path …/robots_ws already exists` | El espacio de trabajo ya estaba clonado | `No lo clone de nuevo: continúe con el paso siguiente.` |
 | El listener no recibe | Terminales con `ROS_DOMAIN_ID` distinto | Abrir terminales nuevas tras editar `~/.bashrc`; revisar `printenv`. |
 | `rosdep: cannot locate rosdep definition` | `rosdep update` no ejecutado | `rosdep update` y repetir. |
 | Gazebo no abre ventana | Controlador gráfico sin aceleración | Instalar el controlador propietario de la GPU; probar `ign gazebo shapes.sdf`. |
@@ -422,4 +407,4 @@ Las pruebas unitarias del material se ejecutan cuando se incorpora cada paquete:
 
 **[6]** Open Robotics, *Gazebo – Installing Gazebo with ROS* (tabla de compatibilidad ROS 2/Gazebo). [En línea]. Disponible: [https://gazebosim.org/docs/all/ros_installation](https://gazebosim.org/docs/all/ros_installation)
 
-**[7]** J. R. Cháux Cedeño, *jc\_ws – espacio de trabajo ROS 2 de la celda JetCobot* (material de esta transferencia, licencia Apache-2.0), 2026.
+**[7]** J. R. Cháux Cedeño, *robots\_ws – paquetes ROS 2 del curso (repositorio en GitHub, licencia Apache-2.0), 2026. [En línea]. Disponible: https://github.com/jchauxdev/robots\_ws*

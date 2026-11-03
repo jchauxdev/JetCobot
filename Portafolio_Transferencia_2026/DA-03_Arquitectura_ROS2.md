@@ -51,7 +51,7 @@ El **grafo de ROS** es el conjunto de nodos y de los canales que los conectan en
 
 *Tabla 1. Comparación de los mecanismos de comunicación de ROS 2.*
 
-| **Patrón** | **Semántica** | **Cuándo usarlo en la celda** | **Ejemplo en jc\_ws** |
+| **Patrón** | **Semántica** | **Cuándo usarlo en la celda** | **Ejemplo en robots\_ws** |
 |---|---|---|---|
 | Tópico | Flujo continuo, asíncrono, N publicadores : M suscriptores; sin confirmación. | Datos periódicos de sensores y estado. | `/joint_states`, `/camera/image_raw`, `/jc/detections` |
 | Servicio | Petición–respuesta, 1:1; el cliente espera el resultado. | Operaciones cortas y atómicas. | `/jc/set_gripper`, `/jetcobot_bridge/power_on` |
@@ -104,7 +104,7 @@ TF2 mantiene un árbol de transformaciones entre marcos con marca de tiempo [4].
 
 ### Paso 0. Incorporar al robots_ws el material de este documento
 
-El espacio de trabajo `~/robots_ws` se construye a medida que avanza la transferencia: cada documento incorpora **solo** el material que usa. Copie desde la reserva (`~/jc_reserva`, DA-02 Paso 7) lo siguiente y revise su contenido antes de ejecutarlo:
+El espacio de trabajo `~/robots_ws` se construye a medida que avanza la transferencia: cada documento incorpora **solo** el material que usa. Agregue desde el repositorio robots\_ws (DA-02, Paso 7) lo siguiente y revise su contenido antes de ejecutarlo:
 
 | **Se incorpora** | **Qué contiene** |
 |---|---|
@@ -114,8 +114,10 @@ El espacio de trabajo `~/robots_ws` se construye a medida que avanza la transfer
 **Terminal (PC)**
 
 ```bash
-cp -r ~/jc_reserva/jc_ws/src/jc_interfaces ~/robots_ws/src/
-cp -r ~/jc_reserva/jc_ws/src/jc_apps ~/robots_ws/src/
+cd ~/robots_ws && git sparse-checkout add src/jc_interfaces
+cd ~/robots_ws && git sparse-checkout add src/jc_apps
+# instala las dependencias de los paquetes agregados
+rosdep install --from-paths ~/robots_ws/src --ignore-src -r -y --skip-keys "mr_navigation jc_driver"
 cd ~/robots_ws
 colcon build --symlink-install --packages-select jc_interfaces jc_apps
 source install/setup.bash
@@ -283,7 +285,9 @@ Este paso necesita el modelo del robot. Incorpore ahora `jc_description` (se est
 **Terminal (PC)**
 
 ```bash
-cp -r ~/jc_reserva/jc_ws/src/jc_description ~/robots_ws/src/
+cd ~/robots_ws && git sparse-checkout add src/jc_description
+# instala las dependencias de los paquetes agregados
+rosdep install --from-paths ~/robots_ws/src --ignore-src -r -y --skip-keys "mr_navigation jc_driver"
 cd ~/robots_ws
 colcon build --symlink-install --packages-select jc_description
 source install/setup.bash
@@ -351,4 +355,4 @@ ros2 run tf2_tools view_frames
 
 **[5]** T. Foote y M. Purvis, *REP 103 – Standard Units of Measure and Coordinate Conventions*. [En línea]. Disponible: [https://www.ros.org/reps/rep-0103.html](https://www.ros.org/reps/rep-0103.html)
 
-**[6]** J. R. Cháux Cedeño, *jc\_ws – espacio de trabajo ROS 2 de la celda JetCobot* (material de esta transferencia, licencia Apache-2.0), 2026.
+**[6]** J. R. Cháux Cedeño, *robots\_ws – paquetes ROS 2 del curso (repositorio en GitHub, licencia Apache-2.0), 2026. [En línea]. Disponible: https://github.com/jchauxdev/robots\_ws*

@@ -137,7 +137,7 @@ Lecciones: (i) con rotaciones pequeñas la componente a lo largo del eje óptico
 
 ### Paso 0. Incorporar al robots_ws el material de este documento
 
-El espacio de trabajo `~/robots_ws` se construye a medida que avanza la transferencia: cada documento incorpora **solo** el material que usa. Copie desde la reserva (`~/jc_reserva`, DA-02 Paso 7) lo siguiente y revise su contenido antes de ejecutarlo:
+El espacio de trabajo `~/robots_ws` se construye a medida que avanza la transferencia: cada documento incorpora **solo** el material que usa. Agregue desde el repositorio robots\_ws (DA-02, Paso 7) lo siguiente y revise su contenido antes de ejecutarlo:
 
 | **Se incorpora** | **Qué contiene** |
 |---|---|
@@ -146,7 +146,9 @@ El espacio de trabajo `~/robots_ws` se construye a medida que avanza la transfer
 **Terminal (PC)**
 
 ```bash
-cp -r ~/jc_reserva/jc_ws/src/jc_vision ~/robots_ws/src/
+cd ~/robots_ws && git sparse-checkout add src/jc_vision
+# instala las dependencias de los paquetes agregados
+rosdep install --from-paths ~/robots_ws/src --ignore-src -r -y --skip-keys "mr_navigation jc_driver"
 cd ~/robots_ws
 colcon build --symlink-install --packages-select jc_vision
 source install/setup.bash
@@ -173,7 +175,7 @@ colcon test --packages-select jc_vision && colcon test-result --verbose
 >
 > 4 pruebas aprobadas: conversión de cuaterniones, proyección de píxel al plano de la mesa, calibración mano-ojo que recupera la transformación verdadera y detector de color/forma.
 
-Compare los rangos de partida de `~/robots_ws/src/jc_vision/config/hsv_profiles.yaml` con los `perfil_*.yaml` que obtuvo en DA-08 (Paso 3). Si incorpora los suyos, recompile con `colcon build --packages-select jc_vision` y compruebe en DA-10 que siguen detectando las piezas de Gazebo; si no, restaure el archivo desde la reserva (`cp ~/jc_reserva/jc_ws/src/jc_vision/config/hsv_profiles.yaml ~/robots_ws/src/jc_vision/config/`).
+Compare los rangos de partida de `~/robots_ws/src/jc_vision/config/hsv_profiles.yaml` con los `perfil_*.yaml` que obtuvo en DA-08 (Paso 3). Si incorpora los suyos, recompile con `colcon build --packages-select jc_vision` y compruebe en DA-10 que siguen detectando las piezas de Gazebo; si no, restaure el archivo original con git (cd ~/robots\_ws && git checkout -- src/jc\_vision/config/hsv\_profiles.yaml).
 
 ### Paso 1. Publicar la cámara en ROS 2
 
@@ -319,4 +321,4 @@ En Gazebo la transformación verdadera entre la brida y la cámara es conocida (
 
 **[16]** P. Corke, *Robotics, Vision and Control: Fundamental Algorithms in Python*, 3rd ed. Cham, Switzerland: Springer, 2023, doi: 10.1007/978-3-031-06469-2.
 
-**[17]** J. R. Cháux Cedeño, *jc\_ws – espacio de trabajo ROS 2 de la celda JetCobot* (material de esta transferencia, licencia Apache-2.0), 2026.
+**[17]** J. R. Cháux Cedeño, *robots\_ws – paquetes ROS 2 del curso (repositorio en GitHub, licencia Apache-2.0), 2026. [En línea]. Disponible: https://github.com/jchauxdev/robots\_ws*

@@ -87,13 +87,13 @@ MoveIt es el marco de manipulación más usado en ROS [7]. En ROS 2 el nodo cent
 
 > **Nota:**
 >
-> En un proyecto nuevo esta configuración se genera con el *MoveIt Setup Assistant* (`ros2 launch moveit_setup_assistant setup_assistant.launch.py`). En jc\_ws se escribió a mano para controlar cada parámetro; compare ambos enfoques como ejercicio.
+> En un proyecto nuevo esta configuración se genera con el *MoveIt Setup Assistant* (`ros2 launch moveit_setup_assistant setup_assistant.launch.py`). En robots\_ws se escribió a mano para controlar cada parámetro; compare ambos enfoques como ejercicio.
 
 ## 3. PROCEDIMIENTO PASO A PASO
 
 ### Paso 0. Incorporar al robots_ws el material de este documento
 
-El espacio de trabajo `~/robots_ws` se construye a medida que avanza la transferencia: cada documento incorpora **solo** el material que usa. Copie desde la reserva (`~/jc_reserva`, DA-02 Paso 7) lo siguiente y revise su contenido antes de ejecutarlo:
+El espacio de trabajo `~/robots_ws` se construye a medida que avanza la transferencia: cada documento incorpora **solo** el material que usa. Agregue desde el repositorio robots\_ws (DA-02, Paso 7) lo siguiente y revise su contenido antes de ejecutarlo:
 
 | **Se incorpora** | **Qué contiene** |
 |---|---|
@@ -104,9 +104,11 @@ El espacio de trabajo `~/robots_ws` se construye a medida que avanza la transfer
 **Terminal (PC)**
 
 ```bash
-cp -r ~/jc_reserva/jc_ws/src/jc_moveit_config ~/robots_ws/src/
-cp -r ~/jc_reserva/jc_ws/src/jc_motion ~/robots_ws/src/
-cp -r ~/jc_reserva/jc_ws/src/jc_bringup ~/robots_ws/src/
+cd ~/robots_ws && git sparse-checkout add src/jc_moveit_config
+cd ~/robots_ws && git sparse-checkout add src/jc_motion
+cd ~/robots_ws && git sparse-checkout add src/jc_bringup
+# instala las dependencias de los paquetes agregados
+rosdep install --from-paths ~/robots_ws/src --ignore-src -r -y --skip-keys "mr_navigation jc_driver"
 cd ~/robots_ws
 colcon build --symlink-install --packages-select jc_moveit_config jc_motion jc_bringup
 source install/setup.bash
@@ -282,4 +284,4 @@ ros2 run jc_apps fk_check
 
 **[12]** P. Corke, *Robotics, Vision and Control: Fundamental Algorithms in Python*, 3rd ed. Cham, Switzerland: Springer, 2023, doi: 10.1007/978-3-031-06469-2.
 
-**[13]** J. R. Cháux Cedeño, *jc\_ws – espacio de trabajo ROS 2 de la celda JetCobot* (material de esta transferencia, licencia Apache-2.0), 2026.
+**[13]** J. R. Cháux Cedeño, *robots\_ws – paquetes ROS 2 del curso (repositorio en GitHub, licencia Apache-2.0), 2026. [En línea]. Disponible: https://github.com/jchauxdev/robots\_ws*

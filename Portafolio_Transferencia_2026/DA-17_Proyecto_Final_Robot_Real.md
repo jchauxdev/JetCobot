@@ -139,7 +139,7 @@ Con `dry_run:=true` el nodo calcula y registra las poses de agarre y depósito *
 | Visión | ROI sobre la zona de trabajo; reducir `detection_window` | Menor latencia; riesgo de ruido |
 | Visión | TensorRT FP16 (YOLO); resolución 640 → 480 | Más FPS; posible menor exactitud |
 | Sistema | `nvpmodel -m 0`, `jetson_clocks`; QoS `best_effort` para imágenes | Menor latencia de cómputo y transporte |
-| Sistema | Executors multihilo y grupos de callbacks (ya usados en jc\_ws) | Evita bloqueos entre servicios y suscripciones |
+| Sistema | Executors multihilo y grupos de callbacks (ya usados en robots\_ws) | Evita bloqueos entre servicios y suscripciones |
 
 *Tabla 5. Optimización del tiempo de ciclo (diligenciar).*
 
@@ -257,4 +257,4 @@ Preguntas abiertas: ¿qué tema requiere más tiempo? ¿qué cambiaría en las p
 
 **[9]** T. Kunz y M. Stilman, "Time-optimal trajectory generation for path following with bounded acceleration and velocity," en *Robotics: Science and Systems VIII*, 2012, doi: 10.15607/RSS.2012.VIII.027.
 
-**[10]** J. R. Cháux Cedeño, *jc\_ws – espacio de trabajo ROS 2 de la celda JetCobot* (material de esta transferencia, licencia Apache-2.0), 2026.
+**[10]** J. R. Cháux Cedeño, *robots\_ws – paquetes ROS 2 del curso (repositorio en GitHub, licencia Apache-2.0), 2026. [En línea]. Disponible: https://github.com/jchauxdev/robots\_ws*

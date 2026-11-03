@@ -26,9 +26,10 @@ L.append('1. **Celda robótica colaborativa con visión artificial**: JetCobot (
 L.append('2. **Robot móvil autónomo de tracción diferencial**: construcción, RoboClaw, ROS 2 Humble en Jetson (Nano, Orin Nano, AGX Orin) o Raspberry Pi, lidar, cámaras, SLAM, Nav2 e integración con la celda del cobot mediante una App web de logística.\n')
 L.append('Cada documento de apoyo (DA) está en dos formatos: **`.docx`** (versión oficial, formato GFPI-F-135) y **`.md`**, que se lee directamente en GitHub y permite **copiar y pegar los comandos**. En los bloques de comandos el encabezado indica dónde se ejecutan: **Terminal – PC**, **Terminal – robot** (Jetson o Raspberry Pi) o ambos.\n')
 L.append('## Contenido del repositorio\n')
+L.append('Los paquetes ROS 2 (`mr_*` y `jc_*`) están en el repositorio aparte [jchauxdev/robots_ws](https://github.com/jchauxdev/robots_ws).\n')
 L.append('| Carpeta / archivo | Contenido |\n|---|---|')
-items = [('Portafolio_Transferencia_2026', 'Transferencia de la celda del cobot: guía de aprendizaje, DA-01 a DA-17 y `jc_ws.zip` (paquetes `jc_*`).'),
-         ('Portafolio_Robot_Movil_2026', 'Transferencia del robot móvil: guía de aprendizaje, carpetas 8 a 21 con sus DA y `mr_ws.zip` (paquetes `mr_*`).'),
+items = [('Portafolio_Transferencia_2026', 'Transferencia de la celda del cobot: guía de aprendizaje y DA-01 a DA-17.'),
+         ('Portafolio_Robot_Movil_2026', 'Transferencia del robot móvil: guía de aprendizaje y carpetas 8 a 21 con sus DA.'),
          ('JetcobotAppPrincipal_v1', 'Aplicación principal del JetCobot: control del robot, secuencias y cliente OPC UA.'),
          ('JetcobotControlGUI', 'Interfaz gráfica de control del JetCobot: paneles, visión por cámara y diagnóstico.'),
          ('JetcobotOPCUA', 'Comunicación OPC UA entre el JetCobot y un PLC, con un programa de prueba.'),
@@ -40,13 +41,15 @@ for p, d in items:
     if os.path.exists(p): L.append(f'| {link(p, p)} | {d} |')
 L.append('')
 L.append('## Espacio de trabajo común: `~/robots_ws`\n')
-L.append('Las dos transferencias usan **un solo espacio de trabajo ROS 2, `~/robots_ws`**, en el PC y en el computador del robot. '
-         'El código completo se entrega como **reserva** en dos archivos comprimidos; cada DA, en su **Paso 0**, copia de la reserva solo los paquetes que usa.\n')
-L.append('**Terminal – PC y robot**\n')
-L.append('```bash\nREPO=https://raw.githubusercontent.com/jchauxdev/JetCobot/main\n# cobot (DA-02)\nmkdir -p ~/jc_reserva && cd ~/jc_reserva\nwget $REPO/Portafolio_Transferencia_2026/jc_ws.zip && unzip jc_ws.zip\n'
-         '# robot móvil (DA-9.1)\nmkdir -p ~/mr_reserva && cd ~/mr_reserva\nwget $REPO/Portafolio_Robot_Movil_2026/mr_ws.zip && unzip mr_ws.zip\n'
-         '# espacio de trabajo común (vacío al inicio)\nmkdir -p ~/robots_ws/src && cd ~/robots_ws && colcon build\n```\n')
-L.append('Para saber qué espacio de trabajo está activo en una terminal (equivalente de `roscd` en ROS 1): `printenv COLCON_PREFIX_PATH`, `ros2 pkg prefix <paquete>` y `colcon_cd` (DA-02, Paso 7.1, y DA-9.1, Paso 6).\n')
+L.append('Los paquetes ROS 2 de las dos transferencias están en el repositorio **[jchauxdev/robots_ws](https://github.com/jchauxdev/robots_ws)**. '
+         'Ese repositorio **es** el espacio de trabajo `~/robots_ws`: se clona vacío una vez por equipo y cada DA, en su **Paso 0**, '
+         'agrega solo los paquetes que usa. Las correcciones del instructor se reciben con `git pull`.\n')
+L.append('**Terminal – PC y computadores del robot con Ubuntu 22.04 (Orin Nano, AGX Orin, Raspberry Pi)**\n')
+L.append('```bash\nsudo apt install -y git\ngit clone --filter=blob:none --sparse https://github.com/jchauxdev/robots_ws.git ~/robots_ws\n'
+         'mkdir -p ~/robots_ws/src && cd ~/robots_ws && colcon build\n# Paso 0 de cada DA (ejemplo): agregar paquetes\n'
+         'git sparse-checkout add src/mr_base src/mr_sim\n# recibir correcciones\ngit pull\n```\n')
+L.append('La Jetson Nano (Ubuntu 18.04, git 2.17) usa el método clásico de sparse-checkout descrito en su DA-11.2.\n')
+L.append('Para saber qué espacio de trabajo está activo en una terminal (equivalente de `roscd` en ROS 1): `printenv COLCON_PREFIX_PATH`, `ros2 pkg prefix <paquete>` y `colcon_cd` (DA-02, Paso 7.1, y DA-9.1, Paso 5).\n')
 for port, name in (('Portafolio_Transferencia_2026', 'Transferencia 1 – Celda robótica colaborativa (JetCobot)'),
                    ('Portafolio_Robot_Movil_2026', 'Transferencia 2 – Robot móvil autónomo')):
     L.append(f'## {name}\n')

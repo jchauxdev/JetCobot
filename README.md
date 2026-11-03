@@ -9,10 +9,12 @@ Cada documento de apoyo (DA) está en dos formatos: **`.docx`** (versión oficia
 
 ## Contenido del repositorio
 
+Los paquetes ROS 2 (`mr_*` y `jc_*`) están en el repositorio aparte [jchauxdev/robots_ws](https://github.com/jchauxdev/robots_ws).
+
 | Carpeta / archivo | Contenido |
 |---|---|
-| [Portafolio_Transferencia_2026](Portafolio_Transferencia_2026) | Transferencia de la celda del cobot: guía de aprendizaje, DA-01 a DA-17 y `jc_ws.zip` (paquetes `jc_*`). |
-| [Portafolio_Robot_Movil_2026](Portafolio_Robot_Movil_2026) | Transferencia del robot móvil: guía de aprendizaje, carpetas 8 a 21 con sus DA y `mr_ws.zip` (paquetes `mr_*`). |
+| [Portafolio_Transferencia_2026](Portafolio_Transferencia_2026) | Transferencia de la celda del cobot: guía de aprendizaje y DA-01 a DA-17. |
+| [Portafolio_Robot_Movil_2026](Portafolio_Robot_Movil_2026) | Transferencia del robot móvil: guía de aprendizaje y carpetas 8 a 21 con sus DA. |
 | [JetcobotAppPrincipal_v1](JetcobotAppPrincipal_v1) | Aplicación principal del JetCobot: control del robot, secuencias y cliente OPC UA. |
 | [JetcobotControlGUI](JetcobotControlGUI) | Interfaz gráfica de control del JetCobot: paneles, visión por cámara y diagnóstico. |
 | [JetcobotOPCUA](JetcobotOPCUA) | Comunicación OPC UA entre el JetCobot y un PLC, con un programa de prueba. |
@@ -23,23 +25,23 @@ Cada documento de apoyo (DA) está en dos formatos: **`.docx`** (versión oficia
 
 ## Espacio de trabajo común: `~/robots_ws`
 
-Las dos transferencias usan **un solo espacio de trabajo ROS 2, `~/robots_ws`**, en el PC y en el computador del robot. El código completo se entrega como **reserva** en dos archivos comprimidos; cada DA, en su **Paso 0**, copia de la reserva solo los paquetes que usa.
+Los paquetes ROS 2 de las dos transferencias están en el repositorio **[jchauxdev/robots_ws](https://github.com/jchauxdev/robots_ws)**. Ese repositorio **es** el espacio de trabajo `~/robots_ws`: se clona vacío una vez por equipo y cada DA, en su **Paso 0**, agrega solo los paquetes que usa. Las correcciones del instructor se reciben con `git pull`.
 
-**Terminal – PC y robot**
+**Terminal – PC y computadores del robot con Ubuntu 22.04 (Orin Nano, AGX Orin, Raspberry Pi)**
 
 ```bash
-REPO=https://raw.githubusercontent.com/jchauxdev/JetCobot/main
-# cobot (DA-02)
-mkdir -p ~/jc_reserva && cd ~/jc_reserva
-wget $REPO/Portafolio_Transferencia_2026/jc_ws.zip && unzip jc_ws.zip
-# robot móvil (DA-9.1)
-mkdir -p ~/mr_reserva && cd ~/mr_reserva
-wget $REPO/Portafolio_Robot_Movil_2026/mr_ws.zip && unzip mr_ws.zip
-# espacio de trabajo común (vacío al inicio)
+sudo apt install -y git
+git clone --filter=blob:none --sparse https://github.com/jchauxdev/robots_ws.git ~/robots_ws
 mkdir -p ~/robots_ws/src && cd ~/robots_ws && colcon build
+# Paso 0 de cada DA (ejemplo): agregar paquetes
+git sparse-checkout add src/mr_base src/mr_sim
+# recibir correcciones
+git pull
 ```
 
-Para saber qué espacio de trabajo está activo en una terminal (equivalente de `roscd` en ROS 1): `printenv COLCON_PREFIX_PATH`, `ros2 pkg prefix <paquete>` y `colcon_cd` (DA-02, Paso 7.1, y DA-9.1, Paso 6).
+La Jetson Nano (Ubuntu 18.04, git 2.17) usa el método clásico de sparse-checkout descrito en su DA-11.2.
+
+Para saber qué espacio de trabajo está activo en una terminal (equivalente de `roscd` en ROS 1): `printenv COLCON_PREFIX_PATH`, `ros2 pkg prefix <paquete>` y `colcon_cd` (DA-02, Paso 7.1, y DA-9.1, Paso 5).
 
 ## Transferencia 1 – Celda robótica colaborativa (JetCobot)
 
@@ -69,7 +71,7 @@ Para saber qué espacio de trabajo está activo en una terminal (equivalente de 
 | Documento | Markdown (copiar comandos) | Word |
 |---|---|---|
 | 8.1 – Construcción del robot móvil de tracción diferencial | [8.1. Construcción del robot.md](Portafolio_Robot_Movil_2026/8.%20CONSTRUCCI%C3%93N%20DEL%20ROBOT/DOCUMENTOS%20DE%20APOYO/8.1.%20Construcci%C3%B3n%20del%20robot.md) | [docx](Portafolio_Robot_Movil_2026/8.%20CONSTRUCCI%C3%93N%20DEL%20ROBOT/DOCUMENTOS%20DE%20APOYO/8.1.%20Construcci%C3%B3n%20del%20robot.docx) |
-| 9.1 – Espacio de trabajo ROS 2 robots_ws: creación paso a paso y material de reserva | [9.1. Espacio de trabajo ROS 2 robots_ws.md](Portafolio_Robot_Movil_2026/9.%20ESPACIO%20DE%20TRABAJO%20ROS%202/DOCUMENTOS%20DE%20APOYO/9.1.%20Espacio%20de%20trabajo%20ROS%202%20robots_ws.md) | [docx](Portafolio_Robot_Movil_2026/9.%20ESPACIO%20DE%20TRABAJO%20ROS%202/DOCUMENTOS%20DE%20APOYO/9.1.%20Espacio%20de%20trabajo%20ROS%202%20robots_ws.docx) |
+| 9.1 – Espacio de trabajo ROS 2 robots_ws: clonación y construcción paso a paso | [9.1. Espacio de trabajo ROS 2 robots_ws.md](Portafolio_Robot_Movil_2026/9.%20ESPACIO%20DE%20TRABAJO%20ROS%202/DOCUMENTOS%20DE%20APOYO/9.1.%20Espacio%20de%20trabajo%20ROS%202%20robots_ws.md) | [docx](Portafolio_Robot_Movil_2026/9.%20ESPACIO%20DE%20TRABAJO%20ROS%202/DOCUMENTOS%20DE%20APOYO/9.1.%20Espacio%20de%20trabajo%20ROS%202%20robots_ws.docx) |
 | 10.1 – Configuración del RoboClaw 2x15A con Basicmicro Motion Studio | [10.1. Configuración del RoboClaw.md](Portafolio_Robot_Movil_2026/10.%20CONFIGURACI%C3%93N%20ROBOCLAW/MATERIAL%20DE%20APOYO/10.1.%20Configuraci%C3%B3n%20del%20RoboClaw.md) | [docx](Portafolio_Robot_Movil_2026/10.%20CONFIGURACI%C3%93N%20ROBOCLAW/MATERIAL%20DE%20APOYO/10.1.%20Configuraci%C3%B3n%20del%20RoboClaw.docx) |
 | 11.1 (Raspberry Pi 4) – Ubuntu 22.04 y ROS 2 Humble en la Raspberry Pi 4 (alternativa) | [11.1. Ubuntu 22.04 y ROS 2 Humble en Raspberry Pi 4.md](Portafolio_Robot_Movil_2026/11.%20INSTALACI%C3%93N%20DE%20LINUX%20-%20ROS%202%20-%20RPI%20-%20JETSON/1.%20RASPBERRY%20PI%204/DOCUMENTOS%20DE%20APOYO/11.1.%20Ubuntu%2022.04%20y%20ROS%202%20Humble%20en%20Raspberry%20Pi%204.md) | [docx](Portafolio_Robot_Movil_2026/11.%20INSTALACI%C3%93N%20DE%20LINUX%20-%20ROS%202%20-%20RPI%20-%20JETSON/1.%20RASPBERRY%20PI%204/DOCUMENTOS%20DE%20APOYO/11.1.%20Ubuntu%2022.04%20y%20ROS%202%20Humble%20en%20Raspberry%20Pi%204.docx) |
 | 11.1 (Jetson Nano) – Instalación de JetPack 4.6.6 (Ubuntu 18.04) en la Jetson Nano: descarga de la imagen, grabación de la microSD o SDK Manager | [11.1. Instalación de Linux JETSON NANO (JetPack 4.6.6).md](Portafolio_Robot_Movil_2026/11.%20INSTALACI%C3%93N%20DE%20LINUX%20-%20ROS%202%20-%20RPI%20-%20JETSON/2.%20JETSON%20NANO/DOCUMENTOS%20DE%20APOYO/11.1.%20Instalaci%C3%B3n%20de%20Linux%20JETSON%20NANO%20%28JetPack%204.6.6%29.md) | [docx](Portafolio_Robot_Movil_2026/11.%20INSTALACI%C3%93N%20DE%20LINUX%20-%20ROS%202%20-%20RPI%20-%20JETSON/2.%20JETSON%20NANO/DOCUMENTOS%20DE%20APOYO/11.1.%20Instalaci%C3%B3n%20de%20Linux%20JETSON%20NANO%20%28JetPack%204.6.6%29.docx) |

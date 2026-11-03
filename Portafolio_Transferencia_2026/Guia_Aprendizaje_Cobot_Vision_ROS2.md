@@ -31,7 +31,7 @@ Fecha Fin: 06/11/2026
 
 ## 2. PRESENTACIÓN
 
-Esta guía tiene la estructura de la transferencia de conocimiento sobre la integración de un robot colaborativo de escritorio (JetCobot de Yahboom) con visión artificial en Python, su integración en **ROS 2 Humble** y su control desde una **NVIDIA Jetson AGX Orin 32 GB**. Está dirigida a instructores, por lo que privilegia la fundamentación formal (modelos, ecuaciones y referencias), la medición cuantitativa de resultados y la reproducibilidad: todo el software entregado (espacio de trabajo `jc_ws`) fue compilado y probado antes de la formación, y cada documento de apoyo indica los resultados de validación obtenidos y sus límites.
+Esta guía tiene la estructura de la transferencia de conocimiento sobre la integración de un robot colaborativo de escritorio (JetCobot de Yahboom) con visión artificial en Python, su integración en **ROS 2 Humble** y su control desde una **NVIDIA Jetson AGX Orin 32 GB**. Está dirigida a instructores, por lo que privilegia la fundamentación formal (modelos, ecuaciones y referencias), la medición cuantitativa de resultados y la reproducibilidad: todo el software entregado (espacio de trabajo `robots_ws`) fue compilado y probado antes de la formación, y cada documento de apoyo indica los resultados de validación obtenidos y sus límites.
 
 La metodología sigue el principio **primero simulación, luego robot real**: cada capacidad se desarrolla en un entorno *mock* (sin física), se verifica en **Gazebo Fortress** y finalmente se transfiere al cobot con las mismas interfaces ROS 2. En visión se parte de **OpenCV** (técnicas clásicas, calibraciones) y se avanza a **PyTorch** con modelos preentrenados y el entrenamiento de un detector de frutas (Ultralytics YOLO), desplegado con TensorRT en la Jetson. En cada documento, **ROS** significa ROS 2.
 
@@ -85,7 +85,7 @@ Documentos de apoyo que acompañan esta guía (formato GFPI-F-135, archivos inde
 | DA-15 | Práctica: transferencia de las trayectorias al cobot real (DA-15\_Trayectorias\_Robot\_Real.docx) | B | 3.4.5 |
 | DA-16 | Práctica: percepción con el robot real: cámara, mano-ojo, detección y TensorRT (DA-16\_Percepcion\_Robot\_Real.docx) | B | 3.4.6 |
 | DA-17 | Proyecto final con el robot real, sustentación y evaluación (DA-17\_Proyecto\_Final\_Robot\_Real.docx) | B | 3.4.7, 3.4.8 |
-| jc\_ws | Espacio de trabajo ROS 2 con el código de todas las prácticas (jc\_ws.zip). Se deja de reserva y cada documento incorpora al workspace del equipo solo los paquetes que usa (Paso 0) | A y B | Todas |
+| robots\_ws | Repositorio con los paquetes ROS 2 de todas las prácticas, https://github.com/jchauxdev/robots\_ws. Se clona vacío y cada documento agrega solo los paquetes que usa (Paso 0) | A y B | Todas |
 
 Prerrequisitos de los participantes: programación en Python (y lectura de C++), Linux a nivel de usuario, álgebra lineal y fundamentos de robótica. Trabajo en equipos de 2–3 personas, uno por cobot.
 
@@ -162,7 +162,7 @@ Se instala ROS 2 Humble y los paquetes de la transferencia en el PC y se crea el
 
 1. Configurar repositorios (paquete `ros2-apt-source`), instalar `ros-humble-desktop` y `ros-dev-tools`, y verificar la instalación con `printenv ROS_DISTRO` (debe mostrar humble) y `printenv ROS_VERSION` (debe mostrar 2).
 1. Instalar ros2\_control, MoveIt 2, Gazebo Fortress (`ros_gz`), cv\_bridge y calibración de cámara.
-1. Descomprimir `jc_ws.zip` como reserva en `~/jc_reserva`, instalar sus dependencias con `rosdep` y crear el workspace `~/robots_ws` vacío, que se construye paso a paso en los documentos siguientes; verificar con la demo talker/listener.
+1. Clonar el espacio de trabajo ~/robots\_ws desde GitHub (vacío), que se construye paso a paso en los documentos siguientes; verificar con la demo talker/listener.
 1. Configurar la terminal para la Parte A (`ROS_DOMAIN_ID` del equipo y `ROS_LOCALHOST_ONLY=1`).
 
 **Equipo de trabajo:PC** con Ubuntu 22.04 y ROS 2 Humble (Parte A). No se usa la Jetson ni se energiza el robot.
@@ -171,7 +171,7 @@ Se instala ROS 2 Humble y los paquetes de la transferencia en el PC y se crea el
 
 **Estrategias o técnicas didácticas activas:** Demostración guiada, práctica dirigida con listas de verificación.
 
-**Materiales de formación:** PC Ubuntu 22.04, jc\_ws.
+**Materiales de formación:** PC Ubuntu 22.04, robots\_ws.
 
 **Material de apoyo:** DA-02.
 
@@ -194,7 +194,7 @@ Se estudian los mecanismos de comunicación de ROS 2 y su selección para las fu
 
 **Estrategias o técnicas didácticas activas:** Clase magistral participativa, aprendizaje por indagación, codificación en vivo.
 
-**Materiales de formación:** PC con jc\_ws.
+**Materiales de formación:** PC con robots\_ws.
 
 **Material de apoyo:** DA-03.
 
@@ -216,7 +216,7 @@ Se construye y valida el modelo cinemático-geométrico del cobot.
 
 **Estrategias o técnicas didácticas activas:** Estudio de caso, práctica dirigida.
 
-**Materiales de formación:** PC con jc\_ws.
+**Materiales de formación:** PC con robots\_ws.
 
 **Material de apoyo:** DA-04.
 
@@ -238,7 +238,7 @@ Se formulan FK, Jacobiano e IK y se planifican movimientos libres de colisión c
 
 **Estrategias o técnicas didácticas activas:** Clase magistral con demostraciones, resolución de problemas.
 
-**Materiales de formación:** PC con jc\_ws.
+**Materiales de formación:** PC con robots\_ws.
 
 **Material de apoyo:** DA-05.
 
@@ -260,7 +260,7 @@ Se simula la celda completa con física, cámara, ros2\_control y MoveIt 2.
 
 **Estrategias o técnicas didácticas activas:** Simulación, experimentación controlada.
 
-**Materiales de formación:** PC con GPU, jc\_ws.
+**Materiales de formación:** PC con GPU, robots\_ws.
 
 **Material de apoyo:** DA-06.
 
@@ -352,7 +352,7 @@ Se prepara la Jetson con ROS 2 Humble y el espacio de trabajo, y se verifica que
 
 **Estrategias o técnicas didácticas activas:** Demostración guiada, práctica dirigida.
 
-**Materiales de formación:** Jetson AGX Orin 32 GB, PC, red cableada, jc\_ws.
+**Materiales de formación:** Jetson AGX Orin 32 GB, PC, red cableada, robots\_ws.
 
 **Material de apoyo:** DA-13.
 
@@ -379,7 +379,7 @@ Se programan clientes de trayectorias y se validan en las etapas de simulación 
 
 **Estrategias o técnicas didácticas activas:** Aprendizaje basado en proyectos, codificación en pares.
 
-**Materiales de formación:** PC con jc\_ws.
+**Materiales de formación:** PC con robots\_ws.
 
 **Material de apoyo:** DA-07.
 
@@ -401,7 +401,7 @@ Se localizan piezas por color, forma y ArUco en el marco del robot y se mide su 
 
 **Estrategias o técnicas didácticas activas:** Práctica de laboratorio con análisis estadístico.
 
-**Materiales de formación:** PC con GPU, jc\_ws.
+**Materiales de formación:** PC con GPU, robots\_ws.
 
 **Material de apoyo:** DA-10.
 
@@ -423,7 +423,7 @@ Los equipos integran percepción, decisión y movimiento en Gazebo y cumplen el 
 
 **Estrategias o técnicas didácticas activas:** Aprendizaje basado en proyectos, trabajo colaborativo.
 
-**Materiales de formación:** PC con GPU, jc\_ws.
+**Materiales de formación:** PC con GPU, robots\_ws.
 
 **Material de apoyo:** DA-12.
 
@@ -448,7 +448,7 @@ Los equipos conectan el JetCobot a la Jetson mediante el driver y verifican cuan
 
 **Estrategias o técnicas didácticas activas:** Práctica de laboratorio, trabajo colaborativo, protocolo de seguridad.
 
-**Materiales de formación:** JetCobot, Jetson, PC, jc\_ws, calibrador.
+**Materiales de formación:** JetCobot, Jetson, PC, robots\_ws, calibrador.
 
 **Material de apoyo:** DA-14.
 
@@ -471,7 +471,7 @@ Se ejecutan en el robot real los nodos desarrollados en simulación siguiendo la
 
 **Estrategias o técnicas didácticas activas:** Práctica de laboratorio, protocolo de seguridad.
 
-**Materiales de formación:** JetCobot, Jetson, PC, jc\_ws.
+**Materiales de formación:** JetCobot, Jetson, PC, robots\_ws.
 
 **Material de apoyo:** DA-15.
 
@@ -687,7 +687,7 @@ Cada equipo sustenta y demuestra su solución; se evalúa la formación y se con
 
 **[31]** International Organization for Standardization, *ISO/TS 15066:2016, Robots and robotic devices — Collaborative robots*. Ginebra: ISO, 2016.
 
-**[32]** J. R. Cháux Cedeño, *jc\_ws – espacio de trabajo ROS 2 de la celda JetCobot* (material de esta transferencia, licencia Apache-2.0), 2026.
+**[32]** J. R. Cháux Cedeño, *robots\_ws – paquetes ROS 2 del curso (repositorio en GitHub, licencia Apache-2.0), 2026. [En línea]. Disponible: https://github.com/jchauxdev/robots\_ws*
 
 ## 7. CONTROL DEL DOCUMENTO
 

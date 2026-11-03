@@ -100,7 +100,7 @@ Para objetos con textura se usan puntos clave con descriptores, p. ej. ORB (bina
 
 ### Paso 0. Incorporar al robots_ws el material de este documento
 
-Estas prácticas no son paquetes de ROS 2: son scripts de Python que se ejecutan directamente. Copie la carpeta desde la reserva:
+Estas prácticas no son paquetes de ROS 2: son scripts de Python que se ejecutan directamente. Agregue la carpeta desde el repositorio robots\_ws:
 
 | **Se incorpora** | **Qué contiene** |
 |---|---|
@@ -109,7 +109,7 @@ Estas prácticas no son paquetes de ROS 2: son scripts de Python que se ejecutan
 **Terminal (PC)**
 
 ```bash
-mkdir -p ~/robots_ws/practicas && cp -r ~/jc_reserva/jc_ws/practicas/dia2_vision ~/robots_ws/practicas/
+cd ~/robots_ws && git sparse-checkout add practicas/dia2_vision
 ```
 
 ### Paso 1. Adquisición y desempeño
@@ -229,4 +229,4 @@ Con la tabla de rasgos, proponga una regla para distinguir el cubo del cilindro 
 
 **[13]** P. Corke, *Robotics, Vision and Control: Fundamental Algorithms in Python*, 3rd ed. Cham, Switzerland: Springer, 2023, doi: 10.1007/978-3-031-06469-2.
 
-**[14]** J. R. Cháux Cedeño, *jc\_ws – espacio de trabajo ROS 2 de la celda JetCobot* (material de esta transferencia, licencia Apache-2.0), 2026.
+**[14]** J. R. Cháux Cedeño, *robots\_ws – paquetes ROS 2 del curso (repositorio en GitHub, licencia Apache-2.0), 2026. [En línea]. Disponible: https://github.com/jchauxdev/robots\_ws*

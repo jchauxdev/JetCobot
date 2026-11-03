@@ -188,31 +188,26 @@ export ROS_LOCALHOST_ONLY=0       # 0 = comunicación por la red (Jetson <-> PC)
 
 ### Paso 5. Llevar el espacio de trabajo a la Jetson y compilarlo
 
-En la Jetson se arma el mismo robots\_ws que el equipo construyó paso a paso en la Parte A: se deja la reserva, se incorporan los paquetes y carpetas ya trabajados (todos menos `jc_driver`, que se incorpora en DA-14 al conectar el robot) y se trae el paquete propio `mi_celda` desde el repositorio Git del equipo:
+En la Jetson se arma el mismo robots\_ws que el equipo construyó paso a paso en la Parte A: se clona el repositorio robots\_ws, se agregan los paquetes y carpetas ya trabajados (todos menos `jc_driver`, que se incorpora en DA-14 al conectar el robot) y se trae el paquete propio `mi_celda` desde el repositorio Git del equipo:
 
 **Terminal (Jetson)**
 
 ```bash
-mkdir -p ~/jc_reserva
-cd ~/jc_reserva
-REPO=https://raw.githubusercontent.com/jchauxdev/JetCobot/main
-wget $REPO/Portafolio_Transferencia_2026/jc_ws.zip
-unzip jc_ws.zip
-mkdir -p ~/robots_ws/src && cd ~/jc_reserva/jc_ws
-cp -r src/jc_interfaces src/jc_apps src/jc_description src/jc_moveit_config \
-      src/jc_motion src/jc_bringup src/jc_vision ~/robots_ws/src/
-cp -r practicas tools ~/robots_ws/
+# si la Jetson ya tiene ~/robots_ws (robot móvil, carpeta 11), omita el git clone
+git clone --filter=blob:none --sparse https://github.com/jchauxdev/robots_ws.git ~/robots_ws
+# paquetes y carpetas trabajados en la Parte A (jc_driver se agrega en el DA-14)
+cd ~/robots_ws && git sparse-checkout add src/jc_interfaces src/jc_apps src/jc_description src/jc_moveit_config src/jc_motion src/jc_bringup src/jc_vision practicas tools
 git clone <repositorio-del-equipo> ~/robots_ws/src/mi_celda
 # 'rosdep init' solo la primera vez
 sudo rosdep init; rosdep update
-rosdep install --from-paths ~/jc_reserva/jc_ws/src --ignore-src -r -y
+rosdep install --from-paths ~/robots_ws/src --ignore-src -r -y --skip-keys "mr_navigation jc_driver"
 cd ~/robots_ws && colcon build --symlink-install
 source install/setup.bash && ros2 pkg list | grep -E "jc_|mi_celda"
 ```
 
 > **Resultado esperado:**
 >
-> `Summary: 8 packages finished` (los 7 paquetes de jc\_ws trabajados en la Parte A más `mi_celda`). En la Jetson AGX Orin la compilación toma del orden de 1–3 minutos (el paquete C++ `jc_motion` es el más pesado).
+> `Summary: 8 packages finished` (los 7 paquetes jc\_\* trabajados en la Parte A más mi\_celda). En la Jetson AGX Orin la compilación toma del orden de 1–3 minutos (el paquete C++ `jc_motion` es el más pesado).
 
 > **Nota:**
 >
@@ -306,7 +301,7 @@ ros2 run jc_apps trajectory_demo
 |---|---|---|---|
 | 1 | JetPack 6.x / Ubuntu 22.04 confirmados en la Jetson | Salida del Paso 1 |  |
 | 2 | ROS 2 Humble instalado en la Jetson; `ROS_DISTRO=humble` | Salida del Paso 3 |  |
-| 3 | jc\_ws (7 paquetes) y `mi_celda` compilan en la Jetson | Captura de `colcon build` |  |
+| 3 | Los 7 paquetes jc\_\* y mi\_celda compilan en la Jetson | Captura de `colcon build` |  |
 | 4 | Talker (Jetson) → listener (PC) en red | Captura de ambas terminales |  |
 | 5 | Celda con robot simulado lanzada en la Jetson por SSH/tmux y comandada desde el PC | Captura de `ros2 node list` y RViz2 |  |
 
@@ -342,4 +337,4 @@ ros2 run jc_apps trajectory_demo
 
 **[6]** Elephant Robotics, *pymycobot – MyCobot 280 Python API* (v4.0.x). [En línea]. Disponible: [https://github.com/elephantrobotics/pymycobot/blob/main/docs/MyCobot_280_en.md](https://github.com/elephantrobotics/pymycobot/blob/main/docs/MyCobot_280_en.md)
 
-**[7]** J. R. Cháux Cedeño, *jc\_ws – espacio de trabajo ROS 2 de la celda JetCobot* (material de esta transferencia, licencia Apache-2.0), 2026.
+**[7]** J. R. Cháux Cedeño, *robots\_ws – paquetes ROS 2 del curso (repositorio en GitHub, licencia Apache-2.0), 2026. [En línea]. Disponible: https://github.com/jchauxdev/robots\_ws*

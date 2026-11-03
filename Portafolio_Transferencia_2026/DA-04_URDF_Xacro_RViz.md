@@ -76,7 +76,7 @@ La cadena cinemática del JetCobot se tomó del modelo `mycobot_280_jn` del repo
 | config/ros2\_controllers.yaml | Controladores: joint\_state\_broadcaster, arm\_controller, gripper\_controller. |
 | launch/display.launch.py | robot\_state\_publisher + joint\_state\_publisher\_gui + RViz2. |
 
-En la Parte B, la imagen de Yahboom para JetPack 6.2 instalada en la Jetson incluye su propio paquete `jetcobot_description` (`ros2 launch jetcobot_description display.launch.py`) con mallas del fabricante [4]; puede usarse para contrastar visualmente, pero sus nombres de articulaciones (`1_Joint`…`6_Joint`) difieren de los de jc\_ws.
+En la Parte B, la imagen de Yahboom para JetPack 6.2 instalada en la Jetson incluye su propio paquete `jetcobot_description` (`ros2 launch jetcobot_description display.launch.py`) con mallas del fabricante [4]; puede usarse para contrastar visualmente, pero sus nombres de articulaciones (`1_Joint`…`6_Joint`) difieren de los de jc\_description.
 
 ## 3. PROCEDIMIENTO PASO A PASO
 
@@ -184,7 +184,7 @@ Usando únicamente los `<origin>` del URDF (Tabla de trabajo), calcule a mano o 
 
 > **Nota:**
 >
-> En jc\_ws la mesa se agrega a MoveIt como objeto de colisión desde `motion_server` (parámetro `add_table`), lo que evita modificar el URDF. Si la agrega también al URDF, deshabilite la colisión `mesa`–`base_link` en el SRDF.
+> En robots\_ws la mesa se agrega a MoveIt como objeto de colisión desde `motion_server` (parámetro `add_table`), lo que evita modificar el URDF. Si la agrega también al URDF, deshabilite la colisión `mesa`–`base_link` en el SRDF.
 
 ## 4. VERIFICACIÓN Y EVIDENCIAS
 
@@ -226,4 +226,4 @@ Usando únicamente los `<origin>` del URDF (Tabla de trabajo), calcule a mano o 
 
 **[8]** T. Foote, "tf: The transform library," en *Proc. IEEE Int. Conf. Technologies for Practical Robot Applications (TePRA)*, 2013, pp. 1–6, doi: 10.1109/TePRA.2013.6556373.
 
-**[9]** J. R. Cháux Cedeño, *jc\_ws – espacio de trabajo ROS 2 de la celda JetCobot* (material de esta transferencia, licencia Apache-2.0), 2026.
+**[9]** J. R. Cháux Cedeño, *robots\_ws – paquetes ROS 2 del curso (repositorio en GitHub, licencia Apache-2.0), 2026. [En línea]. Disponible: https://github.com/jchauxdev/robots\_ws*

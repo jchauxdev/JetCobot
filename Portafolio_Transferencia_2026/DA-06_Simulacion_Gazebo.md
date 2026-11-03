@@ -51,7 +51,7 @@ Con `sudo apt install ros-humble-ros-gz` se instala Gazebo Fortress (`ign gazebo
 
 *Tabla 2. Componentes de la simulación (sim.launch.py).*
 
-| **Elemento** | **Implementación en jc\_ws** |
+| **Elemento** | **Implementación en robots\_ws** |
 |---|---|
 | Mundo | `jc_bringup/worlds/celda.sdf`: mesa (plano z = 0), 3 piezas (cubos rojo y verde de 25 mm, cilindro azul de 25 × 30 mm, 15 g), marcador ArUco DICT\_4X4\_50 id 7 (30 mm), 2 zonas de depósito; paso de física 1 ms. |
 | Plugin de control | `<plugin filename="libign_ros2_control-system.so" name="ign_ros2_control::IgnitionROS2ControlPlugin">` en `jetcobot.gazebo.xacro`, con `<hardware><plugin>ign_ros2_control/IgnitionSystem</plugin>`. |
@@ -80,7 +80,7 @@ Ningún simulador reproduce exactamente fricción, holguras, latencias ni la apa
 
 ### Paso 0. Incorporar al robots_ws el material de este documento
 
-Los paquetes que usa este documento (`jc_description`, `jc_moveit_config`, `jc_motion`, `jc_bringup`) ya están en su `~/robots_ws`. Solo falta copiar desde la reserva la carpeta de herramientas:
+Los paquetes que usa este documento (`jc_description`, `jc_moveit_config`, `jc_motion`, `jc_bringup`) ya están en su `~/robots_ws`. Solo falta agregar desde el repositorio robots\_ws la carpeta de herramientas:
 
 | **Se incorpora** | **Qué contiene** |
 |---|---|
@@ -89,7 +89,7 @@ Los paquetes que usa este documento (`jc_description`, `jc_moveit_config`, `jc_m
 **Terminal (PC)**
 
 ```bash
-cp -r ~/jc_reserva/jc_ws/tools ~/robots_ws/
+cd ~/robots_ws && git sparse-checkout add tools
 ```
 
 ### Paso 1. Probar Gazebo por separado
@@ -231,4 +231,4 @@ ign model -m pieza_roja -p
 
 **[7]** J. Tobin *et al.*, "Domain randomization for transferring deep neural networks from simulation to the real world," en *Proc. IEEE/RSJ IROS*, 2017, pp. 23–30, doi: 10.1109/IROS.2017.8202133.
 
-**[8]** J. R. Cháux Cedeño, *jc\_ws – espacio de trabajo ROS 2 de la celda JetCobot* (material de esta transferencia, licencia Apache-2.0), 2026.
+**[8]** J. R. Cháux Cedeño, *robots\_ws – paquetes ROS 2 del curso (repositorio en GitHub, licencia Apache-2.0), 2026. [En línea]. Disponible: https://github.com/jchauxdev/robots\_ws*

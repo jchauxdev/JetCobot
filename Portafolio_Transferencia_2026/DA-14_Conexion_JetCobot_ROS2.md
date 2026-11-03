@@ -107,7 +107,7 @@ Aunque el JetCobot es un brazo educativo de baja carga, se aplican los principio
 
 ### Paso 0. Incorporar al robots_ws el material de este documento
 
-Este es el último paquete del espacio de trabajo y solo se usa en la Jetson, que es el equipo conectado al robot. Copie desde la reserva de la Jetson (`~/jc_reserva`, DA-13 Paso 5):
+Este es el último paquete del espacio de trabajo y solo se usa en la Jetson, que es el equipo conectado al robot. Agréguelo en la Jetson desde el repositorio robots\_ws (DA-13, Paso 5):
 
 | **Se incorpora** | **Qué contiene** |
 |---|---|
@@ -116,7 +116,9 @@ Este es el último paquete del espacio de trabajo y solo se usa en la Jetson, qu
 **Terminal (Jetson)**
 
 ```bash
-cp -r ~/jc_reserva/jc_ws/src/jc_driver ~/robots_ws/src/
+cd ~/robots_ws && git sparse-checkout add src/jc_driver
+# instala las dependencias de los paquetes agregados
+rosdep install --from-paths ~/robots_ws/src --ignore-src -r -y --skip-keys "mr_navigation jc_driver"
 cd ~/robots_ws
 colcon build --symlink-install --packages-select jc_driver
 source install/setup.bash
@@ -375,4 +377,4 @@ En la Parte A (DA-04) se usaron los valores nominales del modelo. Con el robot *
 
 **[8]** International Organization for Standardization, *ISO/TS 15066:2016, Robots and robotic devices — Collaborative robots*. Ginebra: ISO, 2016.
 
-**[9]** J. R. Cháux Cedeño, *jc\_ws – espacio de trabajo ROS 2 de la celda JetCobot* (material de esta transferencia, licencia Apache-2.0), 2026.
+**[9]** J. R. Cháux Cedeño, *robots\_ws – paquetes ROS 2 del curso (repositorio en GitHub, licencia Apache-2.0), 2026. [En línea]. Disponible: https://github.com/jchauxdev/robots\_ws*

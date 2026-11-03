@@ -35,7 +35,7 @@ Esta guía orienta la transferencia sobre el diseño, la construcción y la prog
 
 La guía se organiza en las secciones 8 a 21 del portafolio y trabaja con ROS 2 Humble: el driver del RoboClaw (mr\_base) controla los motores y publica la odometría, que se calibra con un procedimiento cuantitativo para que una orden de 1 m produzca 1 m; el mapeo se hace con slam\_toolbox y la navegación con Nav2, con puntos **con nombre** y la orden «ir al punto X». Las secciones 19 (RealSense D435i) y 20 (integración con el cobot) completan el recorrido; en la 20, un pedido hecho en una App web en Python hace que el robot vaya al cobot, el cobot detecte y cargue el producto, y el robot lo entregue en la estación indicada.
 
-Todo el software (mr\_ws) se compiló y probó antes de la formación. Para practicar sin hardware ni GPU se incluye un **robot virtual**: un emulador del RoboClaw que habla el mismo protocolo serie y un lidar simulado. Cada documento de apoyo indica los resultados de validación y sus límites. La Jetson Nano solo admite Ubuntu 18.04 (JetPack 4.6.6, último de la serie), por lo que en ella ROS 2 Humble corre en un contenedor Docker de NVIDIA; con la AGX Orin todo corre de forma nativa.
+Todo el software (repositorio robots\_ws) se compiló y probó antes de la formación. Para practicar sin hardware ni GPU se incluye un **robot virtual**: un emulador del RoboClaw que habla el mismo protocolo serie y un lidar simulado. Cada documento de apoyo indica los resultados de validación y sus límites. La Jetson Nano solo admite Ubuntu 18.04 (JetPack 4.6.6, último de la serie), por lo que en ella ROS 2 Humble corre en un contenedor Docker de NVIDIA; con la AGX Orin todo corre de forma nativa.
 
 ![imagen](md_img/Guia_Aprendizaje_Robot_Movil_ROS2_01.jpg)
 
@@ -63,7 +63,7 @@ Documentos de apoyo (formato GFPI-F-135, ubicados en la carpeta de cada sección
 | **Código** | **Documento de apoyo** | **Actividad** |
 |---|---|---|
 | 8.1 | Construcción del robot móvil de tracción diferencial | 3.3.1 |
-| 9.1 | Espacio de trabajo ROS 2 robots\_ws: creación paso a paso y material de reserva | 3.3.1 |
+| 9.1 | Espacio de trabajo ROS 2 robots\_ws: clonación y construcción paso a paso | 3.3.1 |
 | 10.1 | Configuración del RoboClaw 2x15A con Basicmicro Motion Studio | 3.3.1 |
 | 11.1 / 11.2 | JetPack 4.6.6 en la Jetson Nano / ROS 2 Humble en la Nano con Docker | 3.3.2 |
 | 11.1 | Ubuntu 22.04 y ROS 2 en Raspberry Pi 4 (alternativa); Jetson AGX Orin como computador del robot; Jetson Orin Nano DK 8 GB | 3.3.2 |
@@ -81,7 +81,7 @@ Documentos de apoyo (formato GFPI-F-135, ubicados en la carpeta de cada sección
 | 19.1 | Teleoperación (teclado y celular) | 3.3.5 |
 | 20.1 | Intel RealSense D435i en el robot móvil | 3.3.6 |
 | 21.1 | Integración robot móvil – cobot con App de logística | 3.4.1, 3.4.2 |
-| mr\_ws | Material de reserva con todo el código (repositorio del curso, carpeta 12/REPOSITORIOS y raíz del portafolio). El espacio de trabajo robots\_ws se construye paso a paso desde el DA-9.1 | Todas |
+| robots\_ws | Repositorio con los paquetes ROS 2 del curso, https://github.com/jchauxdev/robots\_ws. Se clona vacío en ~/robots\_ws y cada documento agrega sus paquetes (Paso 0) desde el DA-9.1 | Todas |
 
 Prerrequisitos: Linux a nivel de usuario, Python, nociones de electrónica (tensión, corriente, polaridad) y haber cursado o cursar en paralelo la transferencia de ROS 2 del cobot. Trabajo en equipos de 2–3 personas por robot.
 
@@ -150,13 +150,13 @@ Se ensambla y cablea la plataforma y se configura el lazo de velocidad del RoboC
 1. Ensamblar base, motores, electrónica, Jetson y sensores; verificar tensiones con la lista de chequeo.
 1. Medir diámetros de rueda y separación entre ruedas.
 1. Configurar Packet Serial (128, 38 400) y ejecutar el Autotune de velocidad en Motion Studio (Legacy para V5).
-1. Crear el espacio de trabajo robots\_ws en Ubuntu 22.04, con mr\_ws como reserva (DA-9.1), y verificar el RoboClaw desde Linux con check\_roboclaw (DA-10.1, punto 5).
+1. Clonar el espacio de trabajo robots\_ws en Ubuntu 22.04 (DA-9.1) y verificar el RoboClaw desde Linux con check\_roboclaw (DA-10.1, punto 5).
 
 **Ambiente requerido:** Ambiente de aprendizaje tipo aula-laboratorio tecnológico. Para garantizar el bienestar integral de los aprendices e instructores, este espacio debe operar bajo estrictos estándares de seguridad industrial, salud ocupacional y medio ambiente. Esto exige la implementación de condiciones ergonómicas óptimas en el mobiliario para mitigar el riesgo biomecánico, iluminación y climatización adecuadas, señalización clara de rutas de evacuación y disposición de equipos de emergencia. Adicionalmente: laboratorio de robótica con un robot móvil diferencial por equipo (RoboClaw 2x15A, Jetson Nano o Jetson AGX Orin, RPLidar A1, cámara RGB y RealSense D435i), área de pruebas despejada de al menos 6 × 4 m con obstáculos móviles, banco de electrónica con multímetro y fuente, celda del JetCobot, red Wi-Fi del laboratorio sin aislamiento de clientes y acceso a Internet para la instalación de paquetes.
 
 **Estrategias o técnicas didácticas activas:** Práctica de taller, trabajo colaborativo, protocolo de seguridad eléctrica.
 
-**Materiales de formación:** Kit del robot, herramientas, multímetro, PC Windows con Motion Studio, PC con Ubuntu 22.04 y ROS 2 Humble, robots\_ws (reserva mr\_ws).
+**Materiales de formación:** Kit del robot, herramientas, multímetro, PC Windows con Motion Studio, PC con Ubuntu 22.04 y ROS 2 Humble, robots\_ws.
 
 **Material de apoyo:** 8.1, 9.1, 10.1.
 
@@ -176,7 +176,7 @@ Se prepara el computador del robot con Ubuntu, ROS 2 y acceso remoto desde el PC
 
 **Estrategias o técnicas didácticas activas:** Demostración guiada, práctica dirigida.
 
-**Materiales de formación:** Jetson o Raspberry Pi, PC Ubuntu 22.04, robots\_ws (reserva mr\_ws).
+**Materiales de formación:** Jetson o Raspberry Pi, PC Ubuntu 22.04, robots\_ws.
 
 **Material de apoyo:** 11.x.
 
@@ -197,7 +197,7 @@ Se comanda el robot con cmd\_vel, se obtiene su odometría y se calibra hasta cu
 
 **Estrategias o técnicas didácticas activas:** Laboratorio experimental con protocolo de medición, análisis de datos.
 
-**Materiales de formación:** Robot, cinta métrica, cinta de enmascarar, mr\_ws (incluye robot virtual).
+**Materiales de formación:** Robot, cinta métrica, cinta de enmascarar, robots\_ws (incluye robot virtual).
 
 **Material de apoyo:** 12.1, 12.2, 12.3.
 
@@ -219,7 +219,7 @@ Se configura la comunicación ROS 2 entre el robot y el PC, se integra el modelo
 
 **Estrategias o técnicas didácticas activas:** Práctica dirigida, verificación experimental.
 
-**Materiales de formación:** Robot con sensores, PC, red ROBOTS, robots\_ws (reserva mr\_ws).
+**Materiales de formación:** Robot con sensores, PC, red ROBOTS, robots\_ws.
 
 **Material de apoyo:** 13.1–13.3, 14.1, 15.1, 16.1.
 
@@ -438,9 +438,9 @@ Cada equipo demuestra su sistema y se construye el plan de transferencia.
 
 **[32]** J. R. Cháux Cedeño, *Robótica básica – Semana 2: construcción y programación de un robot móvil (documentos de apoyo 8 a 18)*, SENA, 2022–2025.
 
-**[33]** J. R. Cháux Cedeño, *jc\_ws – espacio de trabajo ROS 2 de la celda JetCobot* (material de esta transferencia, licencia Apache-2.0), 2026.
+**[33]** J. R. Cháux Cedeño, *robots\_ws – paquetes ROS 2 del curso (repositorio en GitHub, licencia Apache-2.0), 2026. [En línea]. Disponible: https://github.com/jchauxdev/robots\_ws*
 
-**[34]** J. R. Cháux Cedeño, *mr\_ws – espacio de trabajo ROS 2 del robot móvil diferencial* (material de esta transferencia, licencia Apache-2.0), 2026.
+**[34]** J. R. Cháux Cedeño, *robots\_ws – paquetes ROS 2 del curso (repositorio en GitHub, licencia Apache-2.0), 2026. [En línea]. Disponible: https://github.com/jchauxdev/robots\_ws*
 
 ## 7. CONTROL DEL DOCUMENTO
 

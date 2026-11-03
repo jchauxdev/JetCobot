@@ -82,7 +82,7 @@ $$AP=\int_{0}^{1} P\left( R \right) dR,  {mAP}_{50-95}=\frac{1}{10 C}\su
 
 ### Incorporar al robots_ws el material de este documento
 
-Copie desde la reserva la carpeta de prácticas de aprendizaje profundo (son scripts, no paquetes de ROS 2):
+Agregue desde el repositorio robots\_ws la carpeta de prácticas de aprendizaje profundo (son scripts, no paquetes de ROS 2):
 
 | **Se incorpora** | **Qué contiene** |
 |---|---|
@@ -91,7 +91,7 @@ Copie desde la reserva la carpeta de prácticas de aprendizaje profundo (son scr
 **Terminal (PC)**
 
 ```bash
-mkdir -p ~/robots_ws/practicas && cp -r ~/jc_reserva/jc_ws/practicas/dia3_deep_learning ~/robots_ws/practicas/
+cd ~/robots_ws && git sparse-checkout add practicas/dia3_deep_learning
 ```
 
 ### Entorno virtual de Python
@@ -266,4 +266,4 @@ Verifique en `/jc/debug_image` las cajas, clases y confianzas. Las posiciones 3D
 
 **[12]** J. Tobin *et al.*, "Domain randomization for transferring deep neural networks from simulation to the real world," en *Proc. IEEE/RSJ IROS*, 2017, pp. 23–30, doi: 10.1109/IROS.2017.8202133.
 
-**[13]** J. R. Cháux Cedeño, *jc\_ws – espacio de trabajo ROS 2 de la celda JetCobot* (material de esta transferencia, licencia Apache-2.0), 2026.
+**[13]** J. R. Cháux Cedeño, *robots\_ws – paquetes ROS 2 del curso (repositorio en GitHub, licencia Apache-2.0), 2026. [En línea]. Disponible: https://github.com/jchauxdev/robots\_ws*
