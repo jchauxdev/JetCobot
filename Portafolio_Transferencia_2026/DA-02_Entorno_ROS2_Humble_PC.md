@@ -333,6 +333,33 @@ colcon_cd jc_interfaces
 
 **Resultado esperado:** hoy printenv COLCON\_PREFIX\_PATH muestra /home/&lt;usuario&gt;/robots\_ws/install (el espacio de trabajo vacío ya compilado) y colcon\_cd lleva a ~/robots\_ws; ros2 pkg prefix y colcon\_cd &lt;paquete&gt; funcionarán desde el DA-03, cuando se incorpore el primer paquete. Si COLCON\_PREFIX\_PATH muestra varias carpetas (por ejemplo un espacio de trabajo viejo), deje una sola línea source de espacio de trabajo en ~/.bashrc: si no, ros2 puede usar una copia distinta del paquete que usted edita.
 
+### Paso 7.2. Actualizar la reserva cuando cambie el material
+
+La reserva es una ayuda: de ella salen los paquetes que cada documento copia en su Paso 0, y sirve para comparar o restaurar un archivo. Usted trabaja siempre en `~/robots_ws`. Si el instructor publica una versión nueva de `jc_ws.zip` (corrección o mejora), el archivo `CAMBIOS.md` de la reserva dice qué cambió. Para actualizar:
+
+**Terminal (PC)**
+
+```bash
+# 1. guardar la reserva anterior y descargar la nueva
+mv ~/jc_reserva ~/jc_reserva_anterior
+mkdir -p ~/jc_reserva && cd ~/jc_reserva
+REPO=https://raw.githubusercontent.com/jchauxdev/JetCobot/main
+wget $REPO/Portafolio_Transferencia_2026/jc_ws.zip && unzip jc_ws.zip
+cat ~/jc_reserva/jc_ws/CAMBIOS.md
+# 2. comparar un paquete que ya incorporó con su versión nueva
+diff -rq ~/jc_reserva/jc_ws/src/jc_apps ~/robots_ws/src/jc_apps
+# 3a. traer solo un archivo que cambió (conserva sus demás cambios)
+cp ~/jc_reserva/jc_ws/src/jc_apps/<ruta/archivo> ~/robots_ws/src/jc_apps/<ruta/archivo>
+# 3b. o reemplazar el paquete completo (se pierden sus cambios en ese paquete)
+rm -rf ~/robots_ws/src/jc_apps && cp -r ~/jc_reserva/jc_ws/src/jc_apps ~/robots_ws/src/
+# 4. si CAMBIOS.md menciona dependencias nuevas, instalarlas
+rosdep install --from-paths ~/jc_reserva/jc_ws/src --ignore-src -r -y
+# 5. recompilar el paquete actualizado
+cd ~/robots_ws && colcon build --symlink-install --packages-select jc_apps && source install/setup.bash
+```
+
+Los paquetes que todavía no ha incorporado no requieren nada: el Paso 0 del documento correspondiente los copiará ya desde la reserva nueva. Cuando todo funcione, puede borrar `~/jc_reserva_anterior`.
+
 ### Paso 8. Verificar la instalación
 
 1. Demo C++ ↔ Python: en una terminal `ros2 run demo_nodes_cpp talker`; en otra `ros2 run demo_nodes_py listener`. Debe verse `Publishing: 'Hello World: n'` y `I heard: [Hello World: n]`.
