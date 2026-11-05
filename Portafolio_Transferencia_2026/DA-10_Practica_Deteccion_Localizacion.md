@@ -99,6 +99,19 @@ La cadena completa (TF del robot → modelo de cámara → segmentación → ecu
 
 ## 3. PROCEDIMIENTO PASO A PASO
 
+### Paso 0. Actualizar robots_ws
+
+Antes de empezar, traiga lo nuevo del repositorio robots\_ws y vuelva a compilar:
+
+**Terminal (PC)**
+
+```bash
+# trae lo nuevo del repositorio (correcciones y mejoras)
+cd ~/robots_ws && git pull
+colcon build --symlink-install
+source install/setup.bash
+```
+
 ### Paso 1. Detectores en simulación
 
 **Terminal (PC)**

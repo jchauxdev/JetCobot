@@ -110,12 +110,14 @@ El espacio de trabajo `~/robots_ws` se construye a medida que avanza la transfer
 **Terminal (PC)**
 
 ```bash
+# trae lo nuevo del repositorio (correcciones y mejoras)
+cd ~/robots_ws && git pull
 cd ~/robots_ws && git sparse-checkout add src/jc_interfaces
 cd ~/robots_ws && git sparse-checkout add src/jc_apps
 # instala las dependencias de los paquetes agregados
 rosdep install --from-paths ~/robots_ws/src --ignore-src -r -y --skip-keys "mr_navigation jc_driver"
 cd ~/robots_ws
-colcon build --symlink-install --packages-select jc_interfaces jc_apps
+colcon build --symlink-install
 source install/setup.bash
 # explore la estructura
 tree -L 2 src/
@@ -290,11 +292,13 @@ Se agrega con estos comandos:
 **Terminal (PC)**
 
 ```bash
+# trae lo nuevo del repositorio (correcciones y mejoras)
+cd ~/robots_ws && git pull
 cd ~/robots_ws && git sparse-checkout add src/jc_description
 # instala las dependencias de los paquetes agregados
 rosdep install --from-paths ~/robots_ws/src --ignore-src -r -y --skip-keys "mr_navigation jc_driver"
 cd ~/robots_ws
-colcon build --symlink-install --packages-select jc_description
+colcon build --symlink-install
 source install/setup.bash
 colcon test --packages-select jc_apps && colcon test-result --verbose
 ```

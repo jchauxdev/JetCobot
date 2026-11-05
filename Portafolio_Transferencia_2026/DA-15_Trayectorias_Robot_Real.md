@@ -49,6 +49,19 @@ Los nodos de trayectorias solo usan la acción `/arm_controller/follow_joint_tra
 
 ## 3. PROCEDIMIENTO PASO A PASO
 
+### Paso 0. Actualizar robots_ws
+
+Antes de empezar, traiga lo nuevo del repositorio robots\_ws y vuelva a compilar, en la Jetson y en el PC:
+
+**Terminal (Jetson y PC)**
+
+```bash
+# trae lo nuevo del repositorio (correcciones y mejoras)
+cd ~/robots_ws && git pull
+colcon build --symlink-install
+source install/setup.bash
+```
+
 ### Paso 1. Etapa 3: puente simulado en la Jetson
 
 **Terminal (Jetson, por SSH + tmux)**

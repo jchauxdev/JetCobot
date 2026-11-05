@@ -80,6 +80,19 @@ En la Parte B, la imagen de Yahboom para JetPack 6.2 instalada en la Jetson incl
 >
 > El paquete `jc_description` ya está en su `~/robots_ws`: se incorporó en DA-03, Paso 7. En este documento se estudia por dentro. Explore su estructura con `tree ~/robots_ws/src/jc_description` (carpetas `urdf/`, `launch/`, `rviz/` y `config/`).
 
+### Paso 0. Actualizar robots_ws
+
+Antes de empezar, traiga lo nuevo del repositorio robots\_ws y vuelva a compilar:
+
+**Terminal (PC)**
+
+```bash
+# trae lo nuevo del repositorio (correcciones y mejoras)
+cd ~/robots_ws && git pull
+colcon build --symlink-install
+source install/setup.bash
+```
+
 ### Paso 1. Leer el macro de una articulación
 
 **jc_description/urdf/jetcobot_macro.xacro (fragmento)**

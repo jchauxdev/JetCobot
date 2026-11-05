@@ -100,13 +100,15 @@ El espacio de trabajo `~/robots_ws` se construye a medida que avanza la transfer
 **Terminal (PC)**
 
 ```bash
+# trae lo nuevo del repositorio (correcciones y mejoras)
+cd ~/robots_ws && git pull
 cd ~/robots_ws && git sparse-checkout add src/jc_moveit_config
 cd ~/robots_ws && git sparse-checkout add src/jc_motion
 cd ~/robots_ws && git sparse-checkout add src/jc_bringup
 # instala las dependencias de los paquetes agregados
 rosdep install --from-paths ~/robots_ws/src --ignore-src -r -y --skip-keys "mr_navigation jc_driver"
 cd ~/robots_ws
-colcon build --symlink-install --packages-select jc_moveit_config jc_motion jc_bringup
+colcon build --symlink-install
 source install/setup.bash
 # explore la estructura
 tree -L 2 src/

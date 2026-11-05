@@ -112,11 +112,13 @@ Este es el último paquete del espacio de trabajo y solo se usa en la Jetson, qu
 **Terminal (Jetson)**
 
 ```bash
+# trae lo nuevo del repositorio (correcciones y mejoras)
+cd ~/robots_ws && git pull
 cd ~/robots_ws && git sparse-checkout add src/jc_driver
 # instala las dependencias de los paquetes agregados
 rosdep install --from-paths ~/robots_ws/src --ignore-src -r -y --skip-keys "mr_navigation jc_driver"
 cd ~/robots_ws
-colcon build --symlink-install --packages-select jc_driver
+colcon build --symlink-install
 source install/setup.bash
 # explore la estructura
 tree -L 2 src/jc_driver

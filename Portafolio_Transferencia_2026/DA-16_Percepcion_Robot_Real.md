@@ -51,6 +51,19 @@ La comparación entre la Tabla 3 de DA-10 (simulación) y la Tabla 4 de este doc
 
 ## 4. PROCEDIMIENTO PASO A PASO
 
+### Paso 0. Actualizar robots_ws
+
+Antes de empezar, traiga lo nuevo del repositorio robots\_ws y vuelva a compilar, en la Jetson y en el PC:
+
+**Terminal (Jetson y PC)**
+
+```bash
+# trae lo nuevo del repositorio (correcciones y mejoras)
+cd ~/robots_ws && git pull
+colcon build --symlink-install
+source install/setup.bash
+```
+
 ### Paso 1. Cámara del robot en la Jetson
 
 Si la cámara es la misma que calibró en DA-09 conectándola al PC, copie su `camera_info.yaml` a `~/robots_ws/src/jc_vision/config/` en la Jetson y recompile `jc_vision`. Si es otra cámara, calíbrela primero conectándola temporalmente al PC (DA-09, Paso 2).

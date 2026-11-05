@@ -105,6 +105,8 @@ Estas prácticas no son paquetes de ROS 2: son scripts de Python que se ejecutan
 **Terminal (PC)**
 
 ```bash
+# trae lo nuevo del repositorio (correcciones y mejoras)
+cd ~/robots_ws && git pull
 cd ~/robots_ws && git sparse-checkout add practicas/dia2_vision
 ```
 

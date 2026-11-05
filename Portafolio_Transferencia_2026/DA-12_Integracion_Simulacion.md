@@ -68,6 +68,19 @@ donde nₛ es el orden de simetría de la pieza (4 para el cubo). La validación
 
 ## 4. PROCEDIMIENTO
 
+### Paso 0. Actualizar robots_ws
+
+Antes de empezar, traiga lo nuevo del repositorio robots\_ws y vuelva a compilar:
+
+**Terminal (PC)**
+
+```bash
+# trae lo nuevo del repositorio (correcciones y mejoras)
+cd ~/robots_ws && git pull
+colcon build --symlink-install
+source install/setup.bash
+```
+
 ### Paso 1. Integrar la celda en Gazebo
 
 **Terminal (PC)**

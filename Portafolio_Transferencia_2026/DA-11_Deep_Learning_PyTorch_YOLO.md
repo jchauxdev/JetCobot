@@ -87,6 +87,8 @@ Agregue desde el repositorio robots\_ws la carpeta de prácticas de aprendizaje 
 **Terminal (PC)**
 
 ```bash
+# trae lo nuevo del repositorio (correcciones y mejoras)
+cd ~/robots_ws && git pull
 cd ~/robots_ws && git sparse-checkout add practicas/dia3_deep_learning
 ```
 

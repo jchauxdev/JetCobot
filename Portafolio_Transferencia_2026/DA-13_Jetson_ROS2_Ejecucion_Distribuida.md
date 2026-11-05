@@ -213,6 +213,8 @@ Se agrega con estos comandos:
 # si la Jetson ya tiene ~/robots_ws (robot móvil, carpeta 11), omita el git clone
 git clone --filter=blob:none --sparse https://github.com/jchauxdev/robots_ws.git ~/robots_ws
 # paquetes y carpetas trabajados en la Parte A (jc_driver se agrega en el DA-14)
+# trae lo nuevo del repositorio (correcciones y mejoras)
+cd ~/robots_ws && git pull
 cd ~/robots_ws && git sparse-checkout add src/jc_interfaces src/jc_apps src/jc_description src/jc_moveit_config src/jc_motion src/jc_bringup src/jc_vision practicas tools
 git clone <repositorio-del-equipo> ~/robots_ws/src/mi_celda
 # 'rosdep init' solo la primera vez

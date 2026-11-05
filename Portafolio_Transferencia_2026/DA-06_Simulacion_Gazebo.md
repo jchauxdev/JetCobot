@@ -85,6 +85,8 @@ Los paquetes que usa este documento (`jc_description`, `jc_moveit_config`, `jc_m
 **Terminal (PC)**
 
 ```bash
+# trae lo nuevo del repositorio (correcciones y mejoras)
+cd ~/robots_ws && git pull
 cd ~/robots_ws && git sparse-checkout add tools
 ```
 
