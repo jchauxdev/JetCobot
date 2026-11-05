@@ -17,3 +17,8 @@ Portafolio_Robot_Movil_2026/10. CONFIGURACIÓN ROBOCLAW/MATERIAL DE APOYO/Config
 # Solo se publican los .md: los Word y PDF quedan en el equipo
 *.docx
 *.pdf
+
+# Archivos de grabación de la Seeed AGX Orin (BSP, rootfs y drivers): son de varios GB
+**/Linux_for_Tegra/
+*.tbz2
+*.tar.gz

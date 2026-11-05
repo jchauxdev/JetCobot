@@ -149,6 +149,8 @@ Opcional y recomendado: nombre fijo `/dev/jetcobot`. Edite `idVendor`/`idProduct
 ```bash
 sudo cp ~/robots_ws/src/jc_driver/udev/99-jetcobot.rules /etc/udev/rules.d/
 sudo udevadm control --reload && sudo udevadm trigger
+# ModemManager busca módems en los puertos serie y puede quitarle el puerto a jetcobot_bridge
+sudo systemctl disable --now ModemManager
 ls -l /dev/jetcobot
 ```
 
@@ -354,6 +356,7 @@ En la Parte A (DA-04) se usaron los valores nominales del modelo. Con el robot *
 | El robot no se mueve pero responde | Servos liberados o sin energía | `power_on` / `focus_servos`; revisar fuente |
 | Movimiento brusco al iniciar la trayectoria | Primer punto lejos del estado actual | Iniciar desde el estado actual o usar MoveIt |
 | Acción termina en GOAL\_TOLERANCE\_VIOLATED | Carga, límite articular o tolerancia estricta | Revisar límites; aumentar `settle_timeout`/`goal_tolerance_deg` |
+| El puente pierde la comunicación con el robot (SerialException: device reports readiness to read but returned no data) | ModemManager u otro programa abre el puerto serie del JetCobot | sudo systemctl disable --now ModemManager; sudo fuser -v &lt;puerto&gt; debe mostrar solo jetcobot\_bridge |
 
 ## REFERENCIAS
 
