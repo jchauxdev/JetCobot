@@ -116,25 +116,15 @@ ros2 launch jc_bringup sim.launch.py
 
 Variantes del mismo lanzador; úselas en lugar del comando anterior, también en la Terminal 2:
 
-**Terminal 2 (PC) – variantes**
+| **Terminal 2 (PC) – variantes**<br>`# solo Gazebo + controladores`<br>`ros2 launch jc_bringup sim.launch.py rviz:=false moveit:=false`<br>`ros2 launch jc_bringup sim.launch.py headless:=true world:=celda_sin_camara.sdf` |
+|---|
+| **Nota:**<br>Gazebo y RViz2 dibujan el JetCobot de Yahboom con las mismas mallas que instaló en el DA-03 (Paso 7); si no están instaladas, el brazo aparece con cilindros y cajas. La física usa siempre las geometrías de colisión simples, de modo que la simulación se comporta igual con los dos modelos. |
 
-```bash
-# solo Gazebo + controladores
-ros2 launch jc_bringup sim.launch.py rviz:=false moveit:=false
-ros2 launch jc_bringup sim.launch.py headless:=true world:=celda_sin_camara.sdf
-```
+![imagen](md_img/DA_06_Simulacion_Gazebo_02.jpg)
 
-> **Nota:**
->
-> Gazebo y RViz2 dibujan el JetCobot de Yahboom con las mismas mallas que instaló en el DA-03 (Paso 7); si no están instaladas, el brazo aparece con cilindros y cajas. La física usa siempre las geometrías de colisión simples, de modo que la simulación se comporta igual con los dos modelos.
+**Resultado esperado:**
 
-> **INSERTAR IMAGEN / CAPTURA (por el instructor):**
->
-> *Captura de la ventana de Gazebo con la celda: JetCobot, piezas de colores, marcador ArUco y zonas de depósito.*
-
-> **Resultado esperado:**
->
-> Se abren Gazebo, con la mesa, las tres piezas, el marcador ArUco y el JetCobot de Yahboom, y RViz2 con el panel MotionPlanning. En la Terminal 2, los tres controladores pasan a active.
+Se abren Gazebo, con la mesa, las tres piezas, el marcador ArUco y el JetCobot de Yahboom, y RViz2 con el panel MotionPlanning. En la Terminal 2, los tres controladores pasan a active.
 
 ### Paso 3. Verificar la simulación
 
@@ -214,6 +204,10 @@ ign model -m pieza_roja -p
 >
 > Pose del cubo en Gazebo antes: (0,160; −0,060; 0,0125) m; después: (0,0192; 0,1672; 0,0125) m, es decir, el cubo fue efectivamente agarrado por la física de la pinza y depositado a &lt; 3 mm del objetivo.
 
+> **Nota:**
+>
+> Con el modelo de Yahboom la pinza dibujada no se mueve al cerrar: la malla de Yahboom es la pinza completa en una sola pieza fija, dedos incluidos, igual que en el modelo original del fabricante. Los dedos que agarran el cubo existen como geometría de colisión y sí se cierran. Para comprobarlo, mientras corre el pick and place ejecute en otra terminal ros2 topic echo /joint\_states --field position (los dos últimos valores, gripper\_left\_joint y gripper\_right\_joint, bajan al cerrar y suben al abrir) o, en Gazebo, haga clic derecho sobre el robot y elija View → Collisions para ver los dedos apretando el cubo.
+
 Al terminar, detenga con Ctrl + C las Terminales 3 y 4. Para los experimentos del Paso 6, cierre también la Terminal 2, edite el archivo y vuelva a lanzar la celda.
 
 ### Paso 6. Experimentos
@@ -254,6 +248,7 @@ Al terminar, detenga con Ctrl + C las Terminales 3 y 4. Para los experimentos de
 | MoveIt: *start state out of bounds* | Desfase reloj/estado | Todos los nodos con `use_sim_time:=true` |
 | El brazo se ve con cilindros y cajas en Gazebo o RViz2 | No están instaladas las mallas de Yahboom | importar\_modelo\_yahboom.sh --descargar (DA-03, Paso 7), colcon build --symlink-install --packages-select jc\_description y relanzar |
 | pick\_place\_node espera sin moverse | Falta la Terminal 3 (fake\_detections) o la Terminal 2 (celda) | Revise que las dos sigan ejecutando |
+| La pinza no se ve cerrar, pero el cubo se mueve con el brazo | Con modelo:=yahboom la pinza es una malla fija; los dedos que agarran son de colisión | Es normal. Compruébelo con /joint\_states o con View → Collisions en Gazebo (nota del Paso 5) |
 
 ## REFERENCIAS
 
