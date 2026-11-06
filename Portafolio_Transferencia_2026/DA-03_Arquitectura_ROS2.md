@@ -276,14 +276,17 @@ Al terminar, detenga el nodo con Ctrl + C en la Terminal 1.
 
 ### Paso 5. Crear su propio paquete
 
+En la Terminal 1 cree el paquete y abra los dos archivos que va a editar:
+
 **Terminal 1 (PC)**
 
 ```bash
 cd ~/robots_ws/src
 ros2 pkg create --build-type ament_python mi_celda --dependencies rclpy sensor_msgs
-# editar mi_celda/mi_celda/monitor.py (ver abajo) y registrar en setup.py:
-#   entry_points={'console_scripts': ['monitor = mi_celda.monitor:main']}
-cd ~/robots_ws && colcon build --packages-select mi_celda && source install/setup.bash
+# archivo del nodo: pegue el código de monitor.py (abajo) y guarde
+gedit ~/robots_ws/src/mi_celda/mi_celda/monitor.py
+# registre el ejecutable: setup.py debe quedar como se muestra abajo
+gedit ~/robots_ws/src/mi_celda/setup.py
 ```
 
 **mi_celda/mi_celda/monitor.py**
@@ -310,7 +313,62 @@ def main():
     rclpy.spin(Monitor())
 ```
 
+ros2 pkg create ya generó setup.py; solo hay que completar entry\_points. Cada línea de console\_scripts crea un ejecutable: monitor = mi\_celda.monitor:main significa «el comando monitor ejecuta la función main del archivo mi\_celda/monitor.py». El archivo completo queda así (maintainer, correo, descripción y licencia pueden ser los suyos):
+
+**mi_celda/setup.py (así debe quedar en el Paso 5)**
+
+```
+from setuptools import find_packages, setup
+package_name = 'mi_celda'
+setup(
+    name=package_name,
+    version='0.0.0',
+    packages=find_packages(exclude=['test']),
+    data_files=[
+        ('share/ament_index/resource_index/packages', ['resource/' + package_name]),
+        ('share/' + package_name, ['package.xml']),
+    ],
+    install_requires=['setuptools'],
+    zip_safe=True,
+    maintainer='su_nombre',
+    maintainer_email='su_correo@ejemplo.com',
+    description='Paquete propio de la celda',
+    license='Apache-2.0',
+    tests_require=['pytest'],
+    entry_points={
+        'console_scripts': [
+            # ejecutable = paquete.modulo:funcion
+            'monitor = mi_celda.monitor:main',
+        ],
+    },
+)
+```
+
+Guarde los dos archivos y, en la Terminal 1, compile solo este paquete, cargue el workspace y ejecute el nodo:
+
+**Terminal 1 (PC)**
+
+```bash
+cd ~/robots_ws && colcon build --packages-select mi_celda
+source install/setup.bash
+# Ctrl + C para detenerlo
+ros2 run mi_celda monitor
+```
+
+> **Resultado esperado:**
+>
+> colcon termina con Summary: 1 package finished. El nodo queda esperando sin mostrar nada, porque todavía nadie publica /joint\_states; ros2 node list, en otra terminal, muestra /monitor\_limites. Si aparece «No executable found», revise la línea de entry\_points y vuelva a compilar.
+
 ### Paso 6. Archivo de lanzamiento
+
+Un archivo de lanzamiento arranca varios nodos con un solo comando. En la Terminal 1 cree la carpeta launch y el archivo, y pegue el contenido de abajo:
+
+**Terminal 1 (PC)**
+
+```bash
+mkdir -p ~/robots_ws/src/mi_celda/launch
+gedit ~/robots_ws/src/mi_celda/launch/demo.launch.py
+```
 
 **mi_celda/launch/demo.launch.py**
 
@@ -325,7 +383,55 @@ def generate_launch_description():
     ])
 ```
 
-Agregue en `setup.py` la instalación de la carpeta `launch` (`('share/' + package_name + '/launch', glob('launch/*.py'))`), compile y ejecute ros2 launch mi\_celda demo.launch.py en la Terminal 1 (se detiene con Ctrl + C).
+colcon solo instala lo que setup.py le indica, y ros2 launch busca los archivos en share/mi\_celda/launch del workspace instalado. Por eso setup.py necesita dos cambios: importar os y glob al inicio, y agregar en data\_files la línea que copia launch/\*.launch.py. Abra el archivo (gedit ~/robots\_ws/src/mi\_celda/setup.py) y déjelo así; las líneas marcadas con NUEVO son las que cambian respecto al Paso 5:
+
+**mi_celda/setup.py (así debe quedar en el Paso 6)**
+
+```
+import os                                   # NUEVO (Paso 6)
+from glob import glob                       # NUEVO (Paso 6)
+from setuptools import find_packages, setup
+package_name = 'mi_celda'
+setup(
+    name=package_name,
+    version='0.0.0',
+    packages=find_packages(exclude=['test']),
+    data_files=[
+        ('share/ament_index/resource_index/packages', ['resource/' + package_name]),
+        ('share/' + package_name, ['package.xml']),
+        # NUEVO (Paso 6): instala los archivos de launch/ en share/mi_celda/launch
+        (os.path.join('share', package_name, 'launch'), glob('launch/*.launch.py')),
+    ],
+    install_requires=['setuptools'],
+    zip_safe=True,
+    maintainer='su_nombre',
+    maintainer_email='su_correo@ejemplo.com',
+    description='Paquete propio de la celda',
+    license='Apache-2.0',
+    tests_require=['pytest'],
+    entry_points={
+        'console_scripts': [
+            # ejecutable = paquete.modulo:funcion
+            'monitor = mi_celda.monitor:main',
+        ],
+    },
+)
+```
+
+Guarde, compile y lance en la Terminal 1:
+
+**Terminal 1 (PC)**
+
+```bash
+cd ~/robots_ws && colcon build --packages-select mi_celda
+source install/setup.bash
+# arranca los tres nodos; Ctrl + C los detiene todos
+ros2 launch mi_celda demo.launch.py
+```
+
+> **Resultado esperado:**
+>
+> En la Terminal 1, ros2 launch informa process started para [talker-1], [listener-2] y [monitor-3], y luego se ven los mensajes de [listener-2], que recibe a 5 Hz lo que publica el talker; el monitor no imprime nada mientras nadie publique /joint\_states. En otra terminal, ros2 node list muestra /talker, /listener y /monitor\_limites. Ctrl + C en la Terminal 1 detiene los tres.
 
 ### Paso 7. TF2 con el modelo del robot
 
@@ -419,6 +525,8 @@ ros2 run tf2_tools view_frames
 | Cambios en Python no surten efecto | Compilación sin `--symlink-install` | Recompilar con `--symlink-install` |
 | El brazo se ve con cilindros y cajas en RViz2 | No están instaladas las mallas de Yahboom | ~/robots\_ws/src/jc\_description/scripts/importar\_modelo\_yahboom.sh --descargar; colcon build --symlink-install --packages-select jc\_description |
 | importar\_modelo\_yahboom.sh: curl: command not found o error de descarga | Falta curl o no hay Internet | sudo apt install -y curl y repetir; sin Internet se usa el modelo simple |
+| ros2 launch: file 'demo.launch.py' was not found in the share directory of package 'mi\_celda' | Falta la línea de launch en data\_files de setup.py, o no se volvió a compilar | Revise setup.py (Paso 6), colcon build --packages-select mi\_celda y source install/setup.bash |
+| ros2 run mi\_celda monitor: No executable found | Falta 'monitor = mi\_celda.monitor:main' en entry\_points | Corrija setup.py (Paso 5) y vuelva a compilar |
 
 ## REFERENCIAS
 

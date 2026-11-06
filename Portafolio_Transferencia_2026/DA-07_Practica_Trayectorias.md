@@ -32,11 +32,11 @@
 
 Una trayectoria es una secuencia de puntos (posiciones, opcionalmente velocidades y aceleraciones) con su instante `time_from_start`. El `JointTrajectoryController` de ros2\_control interpola entre puntos según la información disponible [3]: solo posiciones → interpolación lineal; posiciones y velocidades → polinomio cúbico por tramo; posiciones, velocidades y aceleraciones → polinomio de quinto grado. Para un tramo de duración *T* con posiciones y velocidades en los extremos (q₀, q̇₀, q\_f, q̇\_f) [1]:
 
-$$q\left( t \right)={a}_{0}+{a}_{1}t+{a}_{2}{t}^{2}+{a}_{3}{t}^{3}, {a}_{0}={q}_{0}, {a}_{1}={\bar{q}}_{0}, {a}_{2}=\frac{3\left( {q}_{f}-{q}_{0} \right)}{{T}^{2}}-\frac{2{\bar{q}}_{0}+{\bar{q}}_{f}}{T}, {a}_{3}=\frac{-2\left( {q}_{f}-{q}_{0} \right)}{{T}^{3}}+\frac{{\bar{q}}_{0}+{\bar{q}}_{f}}{{T}^{2}} \qquad (1)$$
+$$q\left( t \right)={a}_{0}+{a}_{1}t+{a}_{2}{t}^{2}+{a}_{3}{t}^{3},{a}_{0}={q}_{0},{a}_{1}={\bar{q}}_{0},{a}_{2}=\frac{3\left( {q}_{f}-{q}_{0} \right)}{{T}^{2}}-\frac{2{\bar{q}}_{0}+{\bar{q}}_{f}}{T},{a}_{3}=\frac{-2\left( {q}_{f}-{q}_{0} \right)}{{T}^{3}}+\frac{{\bar{q}}_{0}+{\bar{q}}_{f}}{{T}^{2}} \qquad (1)$$
 
 Con velocidades nulas en los extremos la velocidad máxima del tramo ocurre en *t* = *T*/2:
 
-$${\bar{q}}_{max}=\frac{3}{2} \frac{\left| {q}_{f}-{q}_{0} \right|}{T} \qquad (2)$$
+$${\bar{q}}_{max}=\frac{3}{2}\frac{\left| {q}_{f}-{q}_{0} \right|}{T} \qquad (2)$$
 
 La ecuación (2) permite verificar *a priori* que una trayectoria respeta el límite de 1,5 rad/s definido en el modelo: por ejemplo, un giro de 50° (0,873 rad) en *T* = 2,5 s exige 0,52 rad/s. MoveIt calcula los tiempos automáticamente con TOTG respetando velocidad y aceleración máximas [5].
 
@@ -201,13 +201,21 @@ ros2 run jc_apps square_demo --ros-args -p side:=0.04 -p z:=0.14
 ### Paso 5. Etapa 2 completa en Gazebo y línea base para la Parte B
 
 1. Detenga mock con Ctrl + C en la Terminal 1 y, en esa misma terminal, lance la celda simulada con física y déjela ejecutando: `ros2 launch jc_bringup sim.launch.py`.
-1. En la Terminal 2 ejecute trajectory\_demo con `segment_time:=4.0` y luego `square_demo` (agregue `use_sim_time:=true`).
-1. Mientras corre el punto anterior, registre en una Terminal 3 (Ctrl + C al terminar): `ros2 bag record /joint_states /arm_controller/follow_joint_trajectory/_action/feedback`.
+1. Abra una Terminal 3 y empiece a grabar antes de las pruebas (déjela ejecutando y deténgala con Ctrl + C al terminar): `ros2 bag record /joint_states /arm_controller/follow_joint_trajectory/_action/feedback`.
+1. En la Terminal 2 ejecute las dos pruebas, una después de la otra. Cada parámetro lleva su propio -p; sin él aparece UnknownROSArgsError:
+
+**Terminal 2 (PC)**
+
+```bash
+ros2 run jc_apps trajectory_demo --ros-args -p segment_time:=4.0 -p use_sim_time:=true
+ros2 run jc_apps square_demo --ros-args -p side:=0.04 -p z:=0.14 -p use_sim_time:=true
+```
+
 1. Compare, para cada punto de paso, la posición comandada y la medida en Gazebo (Tabla 2). Esta tabla es la **línea base** con la que comparará el robot real en DA-15.
 
-> **INSERTAR IMAGEN / CAPTURA (por el instructor):**
->
-> *Captura de Gazebo y RViz2 con el JetCobot simulado ejecutando* `square_demo`*.*
+![imagen](md_img/DA_07_Practica_Trayectorias_02.jpg)
+
+*Captura de Gazebo y RViz2 con el JetCobot simulado ejecutando* `square_demo`*.*
 
 *Tabla 2. Comparación comandado vs. medido en Gazebo: línea base para el robot real (diligenciar).*
 
@@ -240,6 +248,7 @@ ros2 run jc_apps square_demo --ros-args -p side:=0.04 -p z:=0.14
 | `PATH_TOLERANCE_VIOLATED` en Gazebo | Trayectoria muy rápida o colisión | Aumentar `segment_time`; revisar escena |
 | El robot simulado 'salta' al primer punto | El primer punto no es el estado actual | Iniciar en `ready` o incluir el estado actual como primer punto |
 | Nodo sin respuesta en Gazebo | Falta `use_sim_time:=true` | Agregar el parámetro a los nodos propios |
+| UnknownROSArgsError: ['use\_sim\_time:=true'] | Falta -p antes del parámetro | Cada parámetro va con su -p: --ros-args -p side:=0.04 -p use\_sim\_time:=true |
 
 ## REFERENCIAS
 
