@@ -82,7 +82,7 @@ Los paquetes que usa este documento (`jc_description`, `jc_moveit_config`, `jc_m
 |---|---|---|---|
 | `tools/` | Scripts de apoyo para la simulación. No son paquetes y no se compilan: se ejecutan con python3. | fake\_detections.py (detecciones simuladas, Paso 5 de este documento), synthetic\_camera.py (cámara sintética sin GPU, DA-10) y handeye\_auto.py (calibración mano-ojo automática en Gazebo, DA-09). | PC. |
 
-**Terminal (PC)**
+**Terminal 1 (PC)**
 
 ```bash
 # trae lo nuevo del repositorio (correcciones y mejoras)
@@ -92,7 +92,9 @@ cd ~/robots_ws && git sparse-checkout add tools
 
 ### Paso 1. Probar Gazebo por separado
 
-**Terminal (PC)**
+En la Terminal 1 abra un mundo de ejemplo para comprobar que Gazebo funciona. Cierre su ventana antes de seguir.
+
+**Terminal 1 (PC)**
 
 ```bash
 # mundo de ejemplo; cierre la ventana para continuar
@@ -103,24 +105,42 @@ ign gazebo --versions
 
 ### Paso 2. Lanzar la celda completa
 
-**Terminal (PC)**
+Abra la Terminal 2 y lance la celda simulada. Déjela ejecutando durante todo el documento: los Pasos 3 a 5 la usan.
+
+**Terminal 2 (PC) – déjela ejecutando**
 
 ```bash
 # Gazebo + RViz2 + MoveIt 2 + motion_server
 ros2 launch jc_bringup sim.launch.py
-# variantes:
+```
+
+Variantes del mismo lanzador; úselas en lugar del comando anterior, también en la Terminal 2:
+
+**Terminal 2 (PC) – variantes**
+
+```bash
 # solo Gazebo + controladores
 ros2 launch jc_bringup sim.launch.py rviz:=false moveit:=false
 ros2 launch jc_bringup sim.launch.py headless:=true world:=celda_sin_camara.sdf
 ```
 
+> **Nota:**
+>
+> Gazebo y RViz2 dibujan el JetCobot de Yahboom con las mismas mallas que instaló en el DA-03 (Paso 7); si no están instaladas, el brazo aparece con cilindros y cajas. La física usa siempre las geometrías de colisión simples, de modo que la simulación se comporta igual con los dos modelos.
+
 > **INSERTAR IMAGEN / CAPTURA (por el instructor):**
 >
 > *Captura de la ventana de Gazebo con la celda: JetCobot, piezas de colores, marcador ArUco y zonas de depósito.*
 
+> **Resultado esperado:**
+>
+> Se abren Gazebo, con la mesa, las tres piezas, el marcador ArUco y el JetCobot de Yahboom, y RViz2 con el panel MotionPlanning. En la Terminal 2, los tres controladores pasan a active.
+
 ### Paso 3. Verificar la simulación
 
-**Terminal (PC)**
+Con la Terminal 2 ejecutando, abra la Terminal 3 y verifique la simulación (ros2 topic hz sigue midiendo hasta Ctrl + C; rqt\_image\_view abre una ventana):
+
+**Terminal 3 (PC)**
 
 ```bash
 # 3 controladores 'active'
@@ -143,7 +163,9 @@ gripper_controller      joint_trajectory_controller/JointTrajectoryController  a
 
 ### Paso 4. Mover el robot simulado
 
-**Terminal (PC)**
+En la Terminal 3 ejecute los movimientos y obsérvelos en Gazebo:
+
+**Terminal 3 (PC)**
 
 ```bash
 ros2 run jc_apps trajectory_demo
@@ -159,12 +181,28 @@ ros2 run jc_apps square_demo --ros-args -p use_sim_time:=true
 
 Antes de integrar la visión (DA-10 y DA-12) se valida la manipulación física inyectando la posición conocida del cubo rojo:
 
-**Terminal (PC)**
+En la Terminal 3 publique la detección simulada del cubo rojo y déjela ejecutando:
+
+**Terminal 3 (PC) – déjela ejecutando**
 
 ```bash
-python3 ~/robots_ws/tools/fake_detections.py 0.16 -0.06 0.025 &
+python3 ~/robots_ws/tools/fake_detections.py 0.16 -0.06 0.025
+```
+
+Abra la Terminal 4 y lance el nodo de pick and place; déjela ejecutando:
+
+**Terminal 4 (PC) – déjela ejecutando**
+
+```bash
 ros2 run jc_apps pick_place_node --ros-args -p use_sim_time:=true \
      --params-file ~/robots_ws/install/jc_bringup/share/jc_bringup/config/celda.yaml
+```
+
+Abra la Terminal 5, envíe la meta de la acción y consulte la pose final del cubo:
+
+**Terminal 5 (PC)**
+
+```bash
 ros2 action send_goal --feedback /jc/pick_place jc_interfaces/action/PickPlace "{label: rojo, use_place_pose: false}"
 # pose final del cubo en Gazebo
 ign model -m pieza_roja -p
@@ -175,6 +213,8 @@ ign model -m pieza_roja -p
 > En la validación: `success: true, message: 'rojo depositada en (0.02, 0.17)'`.
 >
 > Pose del cubo en Gazebo antes: (0,160; −0,060; 0,0125) m; después: (0,0192; 0,1672; 0,0125) m, es decir, el cubo fue efectivamente agarrado por la física de la pinza y depositado a &lt; 3 mm del objetivo.
+
+Al terminar, detenga con Ctrl + C las Terminales 3 y 4. Para los experimentos del Paso 6, cierre también la Terminal 2, edite el archivo y vuelva a lanzar la celda.
 
 ### Paso 6. Experimentos
 
@@ -212,6 +252,8 @@ ign model -m pieza_roja -p
 | Spawners esperan indefinidamente | El robot no se insertó | Revisar `robot_description` y el log de `create` |
 | Robot 'cae' o vibra | Inercias/ganancias poco realistas | Revisar `<inertial>`; reducir paso o velocidades |
 | MoveIt: *start state out of bounds* | Desfase reloj/estado | Todos los nodos con `use_sim_time:=true` |
+| El brazo se ve con cilindros y cajas en Gazebo o RViz2 | No están instaladas las mallas de Yahboom | importar\_modelo\_yahboom.sh --descargar (DA-03, Paso 7), colcon build --symlink-install --packages-select jc\_description y relanzar |
+| pick\_place\_node espera sin moverse | Falta la Terminal 3 (fake\_detections) o la Terminal 2 (celda) | Revise que las dos sigan ejecutando |
 
 ## REFERENCIAS
 

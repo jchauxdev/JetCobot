@@ -206,6 +206,7 @@ source /opt/ros/humble/setup.bash
 source /usr/share/colcon_argcomplete/hook/colcon-argcomplete.bash
 export ROS_DOMAIN_ID=N            # dominio del equipo
 export ROS_LOCALHOST_ONLY=1       # Parte A: solo este PC (en la Parte B se cambia a 0, DA-13)
+export LC_NUMERIC=en_US.UTF-8   # decimales con punto aunque el sistema esté en español
 [ -f ~/robots_ws/install/setup.bash ] && source ~/robots_ws/install/setup.bash
 # colcon_cd: ir a robots_ws o a un paquete (equivalente de roscd, Paso 7.1)
 source /usr/share/colcon_cd/function/colcon_cd.sh
@@ -232,6 +233,7 @@ printenv | grep -E "ROS_DISTRO|ROS_DOMAIN_ID|ROS_LOCALHOST_ONLY"
 | `source .../colcon-argcomplete.bash` | Comodidad: autocompletado con la tecla Tab para `colcon`. |
 | `export ROS_DOMAIN_ID=N` | Canal de comunicación del equipo (se explica abajo). |
 | `export ROS_LOCALHOST_ONLY=1` | Limita la comunicación de ROS 2 a este PC: nada sale a la red. |
+| `export LC_NUMERIC=en_US.UTF-8` | Usa el punto como separador decimal. En un Ubuntu en español la coma es el separador, y algunos programas de ROS 2 (RViz2 con MoveIt, por ejemplo) leen entonces valores como 1.5 como texto y fallan sin mostrar el robot. |
 | `[ -f ~/robots_ws/install/setup.bash ] && source ...` | Carga los paquetes del workspace (*overlay*), **solo si ya existe**: `[ -f archivo ]` pregunta si el archivo existe y `&&` ejecuta el `source` únicamente si la respuesta es sí. Hoy el workspace aún no existe y la línea no hace nada (ni da error); desde el Paso 7, cuando se compile `~/robots_ws`, cada terminal nueva lo cargará sola. Se escribe ahora para no volver a editar `~/.bashrc`. |
 
 `ROS_DOMAIN_ID`**: el canal del equipo.** ROS 2 no tiene un servidor central: los nodos se descubren solos enviando mensajes por la red mediante DDS (*Data Distribution Service*, el sistema de comunicación sobre el que funciona ROS 2). `ROS_DOMAIN_ID` es un número que funciona como un **canal**: solo se ven y se comunican los nodos con el mismo número. Con números distintos, para un nodo el otro no existe, aunque estén en el mismo computador o en la misma red [2]. Internamente, DDS calcula con ese número los puertos de red que usa: el de descubrimiento es aproximadamente 7400 + 250 × N (equipo 5 → puerto 8650; equipo 12 → puerto 10400), de modo que el tráfico de un dominio no llega al otro.

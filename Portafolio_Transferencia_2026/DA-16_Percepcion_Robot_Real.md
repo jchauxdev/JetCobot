@@ -68,13 +68,17 @@ source install/setup.bash
 
 Si la cámara es la misma que calibró en DA-09 conectándola al PC, copie su `camera_info.yaml` a `~/robots_ws/src/jc_vision/config/` en la Jetson y recompile `jc_vision`. Si es otra cámara, calíbrela primero conectándola temporalmente al PC (DA-09, Paso 2).
 
-**Terminal (Jetson, por SSH + tmux)**
+En la Terminal 1 entre a la Jetson por SSH (con tmux), lance la celda con la cámara y déjela ejecutando:
+
+**Terminal 1 (PC → Jetson por SSH + tmux) – déjela ejecutando**
 
 ```bash
 ros2 launch jc_bringup real.launch.py port:=/dev/ttyUSB0 camera:=true rviz:=false compress:=true
 ```
 
-**Terminal (PC)**
+En la Terminal 2 del PC compruebe la imagen y lleve el robot a observe:
+
+**Terminal 2 (PC)**
 
 ```bash
 ros2 topic hz /camera/image_raw/compressed
@@ -88,21 +92,21 @@ ros2 service call /jc/move_to_named jc_interfaces/srv/MoveToNamed "{name: observ
 
 ### Paso 2. Perfiles HSV con la cámara del robot
 
-1. Relance la celda **sin** cámara (`camera:=false`) para liberar `/dev/video0` y lleve el robot a `observe`.
+1. En la Terminal 1, relance la celda **sin** cámara (`camera:=false`) para liberar `/dev/video0` y lleve el robot a `observe`.
 1. En la Jetson (monitor local o VNC, DA-13), ejecute `python3 ~/robots_ws/practicas/dia2_vision/cv_03_segmentacion.py --fuente /dev/video0 --nombre rojo` y repita para verde y azul, como en DA-08.
 1. Copie los rangos a `~/robots_ws/src/jc_vision/config/hsv_profiles.yaml` en la Jetson, recompile `jc_vision` y registre los perfiles en Git (`mi_celda`) para no perderlos.
 
 ### Paso 3. Calibración mano-ojo con el robot real
 
 1. Fije el marcador ArUco id 7 (30 mm) a la mesa dentro de la zona alcanzable y visible desde `observe`.
-1. Con la celda lanzada con cámara (Paso 1), ejecute el nodo **en la Jetson** (procesa la imagen completa):`ros2 run jc_vision handeye_calibration --ros-args -p base_frame:=base_link -p gripper_frame:=link6_flange -p marker_length:=0.030 -p output_file:=$HOME/robots_ws/src/jc_vision/config/handeye_result.yaml`
-1. Desde el **PC**, mueva el robot con RViz2/MoveIt a ≥ 12 poses que varíen J4, J5 y J6 en 15–40° manteniendo el marcador visible y a 20–35 cm. En cada pose, **espere 3 s** y capture desde el PC:`ros2 service call /handeye_calibration/capture std_srvs/srv/Trigger`
-1. Calcule: `ros2 service call /handeye_calibration/compute std_srvs/srv/Trigger`. El registro muestra los 5 métodos.
-1. En la Jetson, recompile `jc_vision` y publique la TF calibrada: `ros2 launch jc_bringup real.launch.py camera:=true handeye:=true rviz:=false compress:=true`.
+1. Con la celda lanzada con cámara (Paso 1), abra una Terminal 3 por SSH en la Jetson y ejecute allí el nodo, que procesa la imagen completa (déjela ejecutando):`ros2 run jc_vision handeye_calibration --ros-args -p base_frame:=base_link -p gripper_frame:=link6_flange -p marker_length:=0.030 -p output_file:=$HOME/robots_ws/src/jc_vision/config/handeye_result.yaml`
+1. Desde el PC (RViz2 en la Terminal 2: ros2 launch jc\_moveit\_config rviz.launch.py), mueva el robot con RViz2/MoveIt a ≥ 12 poses que varíen J4, J5 y J6 en 15–40° manteniendo el marcador visible y a 20–35 cm. En cada pose, **espere 3 s** y capture desde el PC:`ros2 service call /handeye_calibration/capture std_srvs/srv/Trigger`
+1. En una Terminal 4 del PC, calcule: `ros2 service call /handeye_calibration/compute std_srvs/srv/Trigger`. El registro muestra los 5 métodos.
+1. Detenga el nodo de la Terminal 3 y la celda de la Terminal 1 (Ctrl + C). En la Terminal 1, recompile `jc_vision` y publique la TF calibrada: `ros2 launch jc_bringup real.launch.py camera:=true handeye:=true rviz:=false compress:=true`.
 
 > **Resultado esperado:**
 >
-> Archivo `handeye_result.yaml` con `parent_frame: link6_flange`, `child_frame: camera_calibrated_optical`, traslación, cuaternión, método, número de muestras y dispersión. Valores coherentes con la medición física del Paso 8 de DA-14 (≈ 36 mm entre pinza y cámara) y dispersión ≤ 5 mm.
+> Archivo `handeye_result.yaml` con `parent_frame: link6_flange`, `child_frame: camera_calibrated_optical`, traslación, cuaternión, método, número de muestras y dispersión. Valores coherentes con la medición física del Paso 8 de DA-14 (cámara en ≈ (0; −34; 34) mm respecto a la brida en el JetCobot de Yahboom) y dispersión ≤ 5 mm.
 
 *Tabla 2. Resultados de la calibración mano-ojo con el robot real (diligenciar).*
 
@@ -133,13 +137,15 @@ Con la TF calibrada activa, ubique el marcador ArUco en otra posición, obtenga 
 
 ### Paso 5. Detección y localización con el robot real
 
-**Terminal (Jetson)**
+Con la Terminal 1 ejecutando la celda con la TF calibrada, lance la visión en la Terminal 3 (Jetson) y déjela ejecutando:
+
+**Terminal 3 (Jetson, por SSH) – déjela ejecutando**
 
 ```bash
 ros2 launch jc_vision vision.launch.py mode:=real detector:=clasico camera_frame:=camera_calibrated_optical
 ```
 
-**Terminal (PC)**
+**Terminal 2 (PC)**
 
 ```bash
 ros2 topic echo /jc/detections --once
@@ -164,7 +170,7 @@ Con la ecuación (1), estime qué fuente de error domina y proponga la siguiente
 
 Las ruedas de PyTorch de PyPI no están compiladas para la GPU de Jetson. Siga la guía de Ultralytics para NVIDIA Jetson [8]; para JetPack 6 indica (consulta: octubre de 2026) instalar `ultralytics` y luego reemplazar torch/torchvision por ruedas aarch64 compiladas para JetPack 6 (Python 3.10), además de `onnxruntime-gpu`. Verifique la versión de TensorRT del sistema (10.3 en JetPack 6.2 [10]):
 
-**Terminal (Jetson)**
+**Terminal 3 (Jetson, por SSH)**
 
 ```bash
 sudo apt update && sudo apt install -y python3-pip && pip install -U pip
@@ -186,7 +192,7 @@ python3 -c "import tensorrt; print(tensorrt.__version__)"
 
 Copie `best.pt` (entrenado en el PC en DA-11) a la Jetson, por ejemplo con `scp`, y expórtelo **en la Jetson**: los motores TensorRT son específicos del dispositivo y de la versión.
 
-**Terminal (Jetson)**
+**Terminal 3 (Jetson, por SSH)**
 
 ```bash
 cd ~/robots_ws/practicas/dia3_deep_learning
@@ -205,7 +211,9 @@ Ultralytics reporta para YOLO26n en una AGX Orin **64 GB** tiempos de inferencia
 | ONNX |  |  |  |  |
 | TensorRT FP16 (.engine) |  |  |  |  |
 
-**Terminal (Jetson)**
+Detenga la visión clásica de la Terminal 3 (Ctrl + C) y lance allí el detector YOLO con el motor TensorRT:
+
+**Terminal 3 (Jetson, por SSH) – déjela ejecutando**
 
 ```bash
 ros2 run jc_vision yolo_detector --ros-args -p model:=$HOME/best.engine -p conf:=0.5 \
@@ -213,7 +221,7 @@ ros2 run jc_vision yolo_detector --ros-args -p model:=$HOME/best.engine -p conf:
      -p camera_frame:=camera_calibrated_optical -p plane_z:=0.035
 ```
 
-**Terminal (PC)**
+**Terminal 2 (PC)**
 
 ```bash
 ros2 topic echo /jc/detections --once

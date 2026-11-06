@@ -179,6 +179,7 @@ source /opt/ros/humble/setup.bash
 source /usr/share/colcon_argcomplete/hook/colcon-argcomplete.bash
 export ROS_DOMAIN_ID=N            # el mismo en la Jetson y en el PC del equipo
 export ROS_LOCALHOST_ONLY=0       # 0 = comunicación por la red (Jetson <-> PC)
+export LC_NUMERIC=en_US.UTF-8   # decimales con punto aunque el sistema esté en español
 [ -f ~/robots_ws/install/setup.bash ] && source ~/robots_ws/install/setup.bash
 # colcon_cd: ir a robots_ws o a un paquete (equivalente de roscd, DA-02 Paso 7.1)
 source /usr/share/colcon_cd/function/colcon_cd.sh
@@ -197,7 +198,7 @@ En la Jetson se arma el mismo robots\_ws que el equipo construyó paso a paso en
 |---|---|---|---|
 | `src/jc_interfaces` | Interfaces de la celda del cobot (DA-03 de la transferencia), que mr\_cobot\_bridge usa para leer las detecciones. | msg/ DetectedObject y DetectedObjectArray; srv/ MoveToNamed, MoveToPose y SetGripper; action/ Countdown y PickPlace. | Equipo del cobot. |
 | `src/jc_apps` | Nodos didácticos de la celda (DA-03, DA-05). | talker, listener, countdown, param\_demo, fk\_check, trajectory\_demo, square\_demo, pick\_place\_node y launch celda. | Jetson y PC. |
-| `src/jc_description` | Modelo del cobot (DA-04). | URDF/Xacro del myCobot 280, ros2\_control y descripción para Gazebo. | Jetson y PC. |
+| `src/jc_description` | Modelo del cobot (DA-04). | URDF/Xacro del JetCobot de Yahboom, ros2\_control y descripción para Gazebo; las mallas de Yahboom se instalan aparte (importar\_modelo\_yahboom.sh). | Jetson y PC. |
 | `src/jc_moveit_config` | Configuración de MoveIt 2 (DA-05). | SRDF, kinematics.yaml, OMPL, límites y controladores. | Jetson y PC. |
 | `src/jc_motion` | Nodos de movimiento en C++ (DA-05). | motion\_server, pose\_goal\_demo y trajectory\_client. | Jetson y PC. |
 | `src/jc_bringup` | Lanzamiento de la celda (DA-06). | launch mock, sim y real; celda.yaml, mundos y modelos de Gazebo. | Jetson y PC. |
@@ -216,6 +217,8 @@ git clone --filter=blob:none --sparse https://github.com/jchauxdev/robots_ws.git
 # trae lo nuevo del repositorio (correcciones y mejoras)
 cd ~/robots_ws && git pull
 cd ~/robots_ws && git sparse-checkout add src/jc_interfaces src/jc_apps src/jc_description src/jc_moveit_config src/jc_motion src/jc_bringup src/jc_vision practicas tools
+# mallas 3D del JetCobot de Yahboom (como en el PC, DA-03 Paso 7)
+~/robots_ws/src/jc_description/scripts/importar_modelo_yahboom.sh --descargar
 git clone <repositorio-del-equipo> ~/robots_ws/src/mi_celda
 # 'rosdep init' solo la primera vez
 sudo rosdep init; rosdep update
@@ -227,6 +230,10 @@ source install/setup.bash && ros2 pkg list | grep -E "jc_|mi_celda"
 > **Resultado esperado:**
 >
 > `Summary: 8 packages finished` (los 7 paquetes jc\_\* trabajados en la Parte A más mi\_celda). En la Jetson AGX Orin la compilación toma del orden de 1–3 minutos (el paquete C++ `jc_motion` es el más pesado).
+
+> **Nota:**
+>
+> Las mallas se instalan en los dos equipos por razones distintas. La Jetson decide el modelo al lanzar la celda: si tiene las mallas, publica el robot como JetCobot de Yahboom. El PC dibuja ese modelo en RViz2 con sus propias copias de las mallas. Si falta en alguno, el brazo se ve con cilindros y cajas; el movimiento no cambia.
 
 > **Nota:**
 >
@@ -272,7 +279,9 @@ cd ~/robots_ws/src/mi_celda && git pull && cd ~/robots_ws && colcon build --pack
 
 Antes de conectar el JetCobot, verifique toda la cadena distribuida con el driver en **modo simulado**: la Jetson ejecuta la celda como si tuviera el robot y el PC visualiza y da órdenes por la red.
 
-**Terminal (PC → Jetson por SSH)**
+En la Terminal 1 del PC entre a la Jetson por SSH y lance la celda dentro de tmux, para que siga corriendo aunque se cierre la conexión:
+
+**Terminal 1 (PC → Jetson por SSH) – déjela ejecutando**
 
 ```bash
 ssh usuario@IP_JETSON
@@ -281,13 +290,22 @@ ros2 launch jc_bringup real.launch.py simulate:=true rviz:=false compress:=true
 # Ctrl+B y luego D para dejar la sesión corriendo; 'tmux attach -t celda' para volver
 ```
 
-**Terminal (PC)**
+Con la celda corriendo en la Jetson, abra la Terminal 2 del PC: compruebe que ve los nodos de la Jetson y abra RViz2. Déjela ejecutando:
+
+**Terminal 2 (PC) – déjela ejecutando**
 
 ```bash
 # deben aparecer /jetcobot_bridge, /move_group, ...
 ros2 node list
 # RViz2 + MotionPlanning, sin segundo move_group
 ros2 launch jc_moveit_config rviz.launch.py
+```
+
+Abra la Terminal 3 del PC y mueva el robot simulado de la Jetson:
+
+**Terminal 3 (PC)**
+
+```bash
 # corre en el PC y mueve el robot simulado de la Jetson
 ros2 run jc_apps trajectory_demo
 ```

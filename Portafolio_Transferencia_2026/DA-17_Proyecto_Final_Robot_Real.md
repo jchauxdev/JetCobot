@@ -54,20 +54,58 @@ La máquina de estados de `pick_place_node`, la elección del yaw de agarre y la
 
 ## 4. PROCEDIMIENTO DE DESARROLLO
 
+### Etapa 0. Actualizar robots_ws
+
+Antes de empezar, traiga lo nuevo del repositorio robots\_ws y vuelva a compilar, en la Jetson (por SSH) y en el PC:
+
+**Terminal (Jetson y PC)**
+
+```bash
+# trae lo nuevo del repositorio (correcciones y mejoras)
+cd ~/robots_ws && git pull
+colcon build --symlink-install
+source install/setup.bash
+```
+
 ### Etapa 1. Ensayo en seco con el robot real (11:30 a.m. – 12:00 m.)
 
-**Terminal (Jetson, por SSH + tmux): celda real y aplicación, cerca del hardware**
+En la Terminal 1 entre a la Jetson por SSH (con tmux), lance la celda real y déjela ejecutando:
+
+**Terminal 1 (PC → Jetson por SSH + tmux) – celda real; déjela ejecutando**
 
 ```bash
 ros2 launch jc_bringup real.launch.py port:=/dev/ttyUSB0 camera:=true handeye:=true rviz:=false compress:=true
+```
+
+En la Terminal 2 entre también a la Jetson, lance la aplicación en ensayo en seco y déjela ejecutando:
+
+**Terminal 2 (PC → Jetson por SSH) – aplicación; déjela ejecutando**
+
+```bash
 ros2 launch jc_apps celda.launch.py mode:=real detector:=clasico camera_frame:=camera_calibrated_optical dry_run:=true
 ```
 
-**Terminal (PC): visualización y órdenes por la red (mismo ROS_DOMAIN_ID, ROS_LOCALHOST_ONLY=0)**
+En el PC (mismo ROS\_DOMAIN\_ID y ROS\_LOCALHOST\_ONLY=0), abra RViz2 en la Terminal 3:
+
+**Terminal 3 (PC) – déjela ejecutando**
 
 ```bash
 ros2 launch jc_moveit_config rviz.launch.py
+```
+
+En la Terminal 4 vea la imagen de depuración:
+
+**Terminal 4 (PC) – déjela ejecutando**
+
+```bash
 ros2 run rqt_image_view rqt_image_view /jc/debug_image/compressed
+```
+
+En la Terminal 5 ordene la recogida:
+
+**Terminal 5 (PC)**
+
+```bash
 ros2 action send_goal --feedback /jc/pick_place jc_interfaces/action/PickPlace "{label: rojo, use_place_pose: false}"
 ```
 
@@ -87,8 +125,8 @@ Con `dry_run:=true` el nodo calcula y registra las poses de agarre y depósito *
 
 ### Etapa 2. Ejecución real y medición (1:30 p.m. – 2:15 p.m.)
 
-1. Retire `dry_run`, ejecute 10 ciclos y registre éxito/fallo y causa (Tabla 2).
-1. Grabe: `ros2 bag record /jc/detections /joint_states /jc/pick_place/_action/feedback /tf /tf_static`.
+1. Retire dry\_run (Ctrl + C en la Terminal 2 y relance celda.launch.py sin dry\_run:=true), ordene desde la Terminal 5, ejecute 10 ciclos y registre éxito/fallo y causa (Tabla 2).
+1. En una Terminal 6 del PC, grabe: `ros2 bag record /jc/detections /joint_states /jc/pick_place/_action/feedback /tf /tf_static`.
 1. Calcule el tiempo de ciclo real y su desglose por etapa y compárelo con la línea base de simulación (DA-12, Tabla 3).
 
 *Tabla 2. Registro de ciclos en el robot real (diligenciar).*

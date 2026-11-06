@@ -84,7 +84,7 @@ Agregue desde el repositorio robots\_ws la carpeta de prácticas de aprendizaje 
 |---|---|---|---|
 | `practicas/dia3_deep_learning` | Prácticas de aprendizaje profundo con PyTorch y YOLO sin ROS: detector preentrenado, captura del dataset, clasificador y entrenamiento. No se compilan. | dl\_00\_yolo\_preentrenado.py, dl\_01\_captura\_dataset.py, dl\_02\_clasificador\_transfer.py, dl\_03\_yolo\_entrenar.py, frutas.yaml (dataset) y requirements\_dl.txt. | PC (con GPU, si la hay). En la Parte B el modelo entrenado se ejecuta en la Jetson AGX Orin. |
 
-**Terminal (PC)**
+**Terminal 1 (PC)**
 
 ```bash
 # trae lo nuevo del repositorio (correcciones y mejoras)
@@ -96,7 +96,7 @@ cd ~/robots_ws && git sparse-checkout add practicas/dia3_deep_learning
 
 Todo el entrenamiento y las pruebas de este documento se hacen en el PC. Use un entorno virtual de Python para no alterar los paquetes del sistema:
 
-**Terminal (PC)**
+**Terminal 1 (PC)**
 
 ```bash
 python3 -m venv ~/venv_dl && source ~/venv_dl/bin/activate
@@ -110,7 +110,9 @@ python -c "import torch; print(torch.__version__, torch.cuda.is_available())"
 
 ### Paso 1. Detector preentrenado (sin entrenamiento)
 
-**Terminal (PC)**
+Los Pasos 1 a 4 se trabajan en la Terminal 1, con el entorno virtual activado (source ~/venv\_dl/bin/activate; el indicador muestra (venv\_dl)), dentro de ~/robots\_ws/practicas/dia3\_deep\_learning y con la cámara USB conectada al PC. Las ventanas de los scripts se cierran con q o Esc.
+
+**Terminal 1 (PC)**
 
 ```bash
 cd ~/robots_ws/practicas/dia3_deep_learning
@@ -127,7 +129,7 @@ Coloque frutas reales (banano, manzana, naranja) bajo la cámara y registre qué
 
 ### Paso 2. Captura del dataset propio
 
-**Terminal (PC)**
+**Terminal 1 (PC)**
 
 ```bash
 python3 dl_01_captura_dataset.py --fuente /dev/video0 --clase manzana --salida dataset_raw
@@ -136,9 +138,9 @@ python3 dl_01_captura_dataset.py --fuente /dev/video0 --clase limon   --salida d
 
 Etiquete en CVAT (una tarea por clase o mixta), exporte en formato *YOLO 1.1* y organice:
 
-**Terminal (PC)**
+**Estructura de carpetas del dataset (no son comandos)**
 
-```bash
+```
 datasets/frutas/images/{train,val,test}/*.jpg
 # <clase> <xc> <yc> <w> <h> normalizados
 datasets/frutas/labels/{train,val,test}/*.txt
@@ -148,7 +150,7 @@ frutas.yaml
 
 ### Paso 3. Clasificador por transferencia con PyTorch (opcional, conceptual)
 
-**Terminal (PC)**
+**Terminal 1 (PC)**
 
 ```bash
 python3 dl_02_clasificador_transfer.py --datos datos --epocas 10 --congelar
@@ -158,7 +160,7 @@ El script reemplaza la última capa de MobileNetV3-Small preentrenada en ImageNe
 
 ### Paso 4. Entrenamiento del detector YOLO
 
-**Terminal (PC)**
+**Terminal 1 (PC)**
 
 ```bash
 python3 dl_03_yolo_entrenar.py --datos frutas.yaml --modelo yolo11n.pt --epocas 100 --imgsz 640 --lote 16
@@ -200,13 +202,36 @@ Interprete con su dataset real: si la pérdida de entrenamiento baja y la de val
 
 Al terminar el entrenamiento, `dl_03` exporta automáticamente `best.onnx` junto a `best.pt`. Pruebe el detector como nodo ROS 2 con la cámara conectada al PC. La celda en modo *mock* se lanza solo para que exista el árbol TF de la cámara:
 
-**Terminal (PC)**
+En la Terminal 1 lance la celda mock y déjela ejecutando:
+
+**Terminal 1 (PC) – déjela ejecutando**
 
 ```bash
 ros2 launch jc_bringup mock.launch.py
+```
+
+En la Terminal 2 publique la cámara y déjela ejecutando:
+
+**Terminal 2 (PC) – déjela ejecutando**
+
+```bash
 ros2 run jc_vision camera_node --ros-args -p device:=/dev/video0
+```
+
+En la Terminal 3 lance el detector YOLO del equipo y déjela ejecutando:
+
+**Terminal 3 (PC) – déjela ejecutando**
+
+```bash
 ros2 run jc_vision yolo_detector --ros-args -p model:=$HOME/robots_ws/practicas/dia3_deep_learning/runs/detect/frutas/weights/best.pt \
      -p conf:=0.5 -p image_topic:=/camera/image_raw -p camera_info_topic:=/camera/camera_info
+```
+
+En la Terminal 4 vea la imagen de depuración:
+
+**Terminal 4 (PC)**
+
+```bash
 ros2 run rqt_image_view rqt_image_view /jc/debug_image
 ```
 

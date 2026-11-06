@@ -183,14 +183,18 @@ ros2 run jc_driver check_robot --simulate
 
 Equivalente al `jetcobot_driver sync_plan` de Yahboom [3] y al `sync_plan.py` de Elephant Robotics [2]: el nodo `joint_state_follower` se suscribe a `/joint_states` (publicado por los deslizadores de `joint_state_publisher_gui`) y envía `send_angles`.
 
-**Terminal (PC)**
+En la Terminal 1 del PC abra el modelo con los deslizadores y déjela ejecutando:
+
+**Terminal 1 (PC) – déjela ejecutando**
 
 ```bash
 # modelo + deslizadores en el PC
 ros2 launch jc_description display.launch.py
 ```
 
-**Terminal (Jetson, por SSH): seguidor a velocidad baja**
+En la Terminal 2 entre a la Jetson por SSH (ssh usuario@IP\_JETSON) y lance el seguidor:
+
+**Terminal 2 (Jetson, por SSH) – seguidor a velocidad baja; déjela ejecutando**
 
 ```bash
 ros2 run jc_driver joint_state_follower --ros-args -p port:=/dev/ttyUSB0 -p baud:=1000000 -p speed:=25
@@ -217,17 +221,21 @@ Los deslizadores corren en el PC y el seguidor en la Jetson: el tópico `/joint_
 >
 > *Fotografía/video corto del robot siguiendo el deslizador de J1 en RViz2.*
 
-Finalice con Ctrl+C en ambas terminales antes de continuar.
+Finalice con Ctrl + C en las Terminales 1 y 2 antes de continuar.
 
 ### Paso 4. Puente ROS 2 en modo simulado (sin hardware)
 
-**Terminal (Jetson)**
+En la Terminal 1 entre a la Jetson por SSH y lance el puente en modo simulado; déjela ejecutando:
+
+**Terminal 1 (Jetson, por SSH) – déjela ejecutando**
 
 ```bash
 ros2 launch jc_driver bridge.launch.py simulate:=true
 ```
 
-**Terminal (PC)**
+En la Terminal 2 del PC compruebe lo que publica el puente:
+
+**Terminal 2 (PC)**
 
 ```bash
 # ≈ 15 Hz
@@ -237,28 +245,34 @@ ros2 action list -t
 ros2 service list | grep jetcobot_bridge
 ```
 
+Al terminar, detenga el puente con Ctrl + C en la Terminal 1.
+
 ### Paso 5. Puente ROS 2 con el robot real
 
 > **Nota:**
 >
 > ¿Dónde se ejecuta? El puente **siempre** corre en la Jetson, porque el robot está conectado a ella por USB (láncelo por SSH desde el PC, ver DA-13, Paso 8). Los comandos de verificación (`ros2 topic`, `ros2 action`, `ros2 service`, `trajectory_demo`) pueden ejecutarse en la Jetson **o en el PC**, si ambos están en la misma red con el mismo `ROS_DOMAIN_ID`. Mientras el puente está activo, no lance simulaciones en ese dominio desde el PC.
 
-**Terminal (Jetson)**
+Con el robot energizado y en una zona despejada, lance el puente real en la Terminal 1 (Jetson, por SSH) y déjela ejecutando:
+
+**Terminal 1 (Jetson, por SSH) – déjela ejecutando**
 
 ```bash
 ros2 launch jc_driver bridge.launch.py port:=/dev/ttyUSB0 baud:=1000000
 ```
 
-**Terminal (PC)**
+En la Terminal 2 del PC compruebe que llegan los estados del robot real:
+
+**Terminal 2 (PC)**
 
 ```bash
 ros2 topic hz /joint_states
 ros2 topic echo /joint_states --once
 ```
 
-Envíe una trayectoria corta (J1 a +20° y regreso, 3 s por tramo) directamente con la CLI:
+Envíe una trayectoria corta (J1 a +20° y regreso, 3 s por tramo) directamente con la CLI, también en la Terminal 2:
 
-**Terminal (PC)**
+**Terminal 2 (PC)**
 
 ```bash
 ros2 action send_goal --feedback /arm_controller/follow_joint_trajectory \
@@ -273,9 +287,9 @@ ros2 action send_goal --feedback /arm_controller/follow_joint_trajectory \
 >
 > Realimentación periódica con `actual.positions` y resultado `error_code: 0` (SUCCESSFUL). En el ensayo con el robot simulado del material se obtuvo exactamente este resultado.
 
-Pruebe la cancelación: repita el envío y presione Ctrl+C a mitad de la trayectoria; el robot debe detenerse. Pruebe los servicios:
+Pruebe la cancelación: repita el envío y presione Ctrl+C a mitad de la trayectoria; el robot debe detenerse. Pruebe los servicios en la Terminal 2:
 
-**Terminal (PC)**
+**Terminal 2 (PC)**
 
 ```bash
 ros2 service call /jetcobot_bridge/stop std_srvs/srv/Trigger
@@ -304,12 +318,14 @@ ros2 run jc_apps trajectory_demo
 
 Con el puente y el modelo en marcha en la Jetson (`ros2 launch jc_bringup real.launch.py rviz:=false`), compare `get_coords()` (marco base del firmware) con `ros2 run tf2_ros tf2_echo base_link link6_flange` en 3 configuraciones. Las posiciones pueden diferir en un desplazamiento constante (origen distinto del marco base del firmware respecto a `base_link` del URDF). Documente la diferencia: será necesaria para reutilizar posiciones guardadas con `send_coords` (como `PosEncimaPieza` en `posiciones_guardadas.json`).
 
+En el modelo, J1 está a 135,46 mm sobre base\_link, la altura del JetCobot de Yahboom; con q = 0 la brida queda a 414,0 mm. Lance la celda en la Terminal 1 (Jetson, por SSH) y déjela ejecutando; consulte la TF en la Terminal 2.
+
 *Tabla 6. Contraste firmware vs. modelo (diligenciar).*
 
 | **Configuración q [°]** | **get\_coords x,y,z [mm]** | **TF base\_link→link6\_flange [mm]** | **Diferencia [mm]** |
 |---|---|---|---|
-| 0,0,0,0,0,0 |  | 45.6, −64.6, 436.1 (modelo) |  |
-| 0,0,−90,0,0,0 |  | 169.2, −64.6, 221.4 (modelo) |  |
+| 0,0,0,0,0,0 |  | 45.6, −64.6, 414.0 (modelo) |  |
+| 0,0,−90,0,0,0 |  | 169.2, −64.6, 199.3 (modelo) |  |
 | libre |  |  |  |
 
 ### Paso 8. Medir el TCP y la cámara en el robot real
@@ -317,7 +333,7 @@ Con el puente y el modelo en marcha en la Jetson (`ros2 launch jc_bringup real.l
 En la Parte A (DA-04) se usaron los valores nominales del modelo. Con el robot **apagado o con servos bloqueados**, mida con calibrador:
 
 1. La distancia desde la brida (`link6_flange`) hasta el punto de agarre entre los dedos (modelo: 95 mm, parámetro `tcp_offset`).
-1. La posición del centro óptico de la cámara respecto a la brida (modelo: 36 mm; parámetros `cam_x`, `cam_y`, `cam_z` del macro).
+1. La posición del centro óptico de la cámara respecto a la brida (modelo del JetCobot de Yahboom: cam\_x = 0, cam\_y = −34 mm, cam\_z = 34 mm; parámetros del macro).
 1. Si la diferencia supera 2 mm, actualice los valores por defecto en `jc_description/urdf/` (`jetcobot.urdf.xacro` y `jetcobot_macro.xacro`), recompile en la Jetson y en el PC, y verifique con `ros2 run tf2_ros tf2_echo link6_flange tcp`.
 
 *Tabla 7. Medidas físicas del robot (diligenciar). La posición definitiva de la cámara se obtiene con la calibración mano-ojo (DA-16).*
@@ -325,7 +341,7 @@ En la Parte A (DA-04) se usaron los valores nominales del modelo. Con el robot *
 | **Medida** | **Valor del modelo [mm]** | **Valor medido [mm]** | **¿Se actualizó el modelo?** |
 |---|---|---|---|
 | TCP (tcp\_offset) | 95 |  |  |
-| Cámara (cam\_x, cam\_y, cam\_z) | 36, 0, 20 |  |  |
+| Cámara (cam\_x, cam\_y, cam\_z) | 0, −34, 34 |  |  |
 
 ## 5. VERIFICACIÓN Y EVIDENCIAS
 

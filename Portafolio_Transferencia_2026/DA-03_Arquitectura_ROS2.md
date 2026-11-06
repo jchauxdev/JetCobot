@@ -107,7 +107,7 @@ El espacio de trabajo `~/robots_ws` se construye a medida que avanza la transfer
 | `src/jc_interfaces` | Define los mensajes, servicios y acciones propios de la celda, para que todos los nodos (visión, movimiento, pick and place) se entiendan con los mismos tipos de datos. | msg/ DetectedObject y DetectedObjectArray; srv/ MoveToNamed, MoveToPose y SetGripper; action/ Countdown y PickPlace. Paquete ament\_cmake: genera las interfaces en C++ y Python al compilar. | PC (Parte A). En la Parte B también en la Jetson AGX Orin (DA-13). Lo usan casi todos los demás paquetes (y mr\_cobot\_bridge en la integración con el robot móvil). |
 | `src/jc_apps` | Nodos didácticos en Python para aprender tópicos, servicios, acciones y parámetros; también trae la cinemática, las trayectorias y el pick and place de los DA siguientes. | talker, listener, param\_demo, gripper\_service\_demo, countdown\_server y countdown\_client (DA-03); fk\_check, trajectory\_demo y square\_demo (DA-05, DA-07); pick\_place\_node y launch celda (DA-12); pruebas en test/. | PC (Parte A). En la Parte B también en la Jetson AGX Orin (DA-13). |
 
-**Terminal (PC)**
+**Terminal 1 (PC)**
 
 ```bash
 # trae lo nuevo del repositorio (correcciones y mejoras)
@@ -136,14 +136,27 @@ Revise `jc_apps/setup.py`: la sección `entry_points` asocia cada ejecutable (`t
 
 ### Paso 1. Primer contacto con el grafo
 
-**Terminal (PC)**
+Abra la Terminal 1 y lance el publicador. Déjela ejecutando: imprime un mensaje por cada publicación.
+
+**Terminal 1 (PC) – déjela ejecutando**
 
 ```bash
-# Terminal 1
 ros2 run jc_apps talker --ros-args -p rate_hz:=2.0
-# Terminal 2
+```
+
+Abra la Terminal 2 y lance el suscriptor. Déjela ejecutando: muestra los mensajes que recibe del publicador.
+
+**Terminal 2 (PC) – déjela ejecutando**
+
+```bash
 ros2 run jc_apps listener
-# Terminal 3: introspección
+```
+
+Con las Terminales 1 y 2 ejecutando, abra la Terminal 3 e inspeccione el grafo. ros2 topic hz y ros2 topic echo siguen midiendo hasta que pulse Ctrl + C; rqt\_graph abre una ventana.
+
+**Terminal 3 (PC)**
+
+```bash
 ros2 node list
 ros2 node info /talker
 ros2 topic list -t
@@ -158,6 +171,8 @@ ros2 run rqt_graph rqt_graph
 > `ros2 topic hz` reporta ≈ 2,0 Hz. `rqt_graph` muestra `/talker → /celda/estado → /listener`.
 
 ![imagen](md_img/DA_03_Arquitectura_ROS2_03.jpg)
+
+Al terminar, detenga el publicador y el suscriptor con Ctrl + C en las Terminales 1 y 2.
 
 Revise el código fuente de `jc_apps/talker.py` (fragmento):
 
@@ -178,10 +193,19 @@ class Talker(Node):
 
 ### Paso 2. Servicio con interfaz propia
 
-**Terminal (PC)**
+En la Terminal 1 lance el servidor del servicio y déjela ejecutando.
+
+**Terminal 1 (PC) – déjela ejecutando**
 
 ```bash
 ros2 run jc_apps gripper_service_demo
+```
+
+En la Terminal 2 consulte el servicio y llámelo:
+
+**Terminal 2 (PC)**
+
+```bash
 ros2 service list -t | grep demo
 ros2 service call /demo/set_gripper jc_interfaces/srv/SetGripper "{opening: 0.5}"
 # debe rechazarse
@@ -194,12 +218,23 @@ ros2 service call /demo/set_gripper jc_interfaces/srv/SetGripper "{opening: 1.7}
 >
 > Con 1.7: `success: false, message: 'opening debe estar en [0, 1]'` (validación en el servidor).
 
+Al terminar, detenga el servidor con Ctrl + C en la Terminal 1.
+
 ### Paso 3. Acción con realimentación y cancelación
 
-**Terminal (PC)**
+En la Terminal 1 lance el servidor de la acción y déjela ejecutando.
+
+**Terminal 1 (PC) – déjela ejecutando**
 
 ```bash
 ros2 run jc_apps countdown_server
+```
+
+En la Terminal 2 envíe metas a la acción:
+
+**Terminal 2 (PC)**
+
+```bash
 ros2 action list -t
 ros2 action send_goal --feedback /demo/countdown jc_interfaces/action/Countdown "{seconds: 5}"
 # cliente en Python; pruebe Ctrl+C para cancelar
@@ -208,12 +243,23 @@ ros2 run jc_apps countdown_client 8
 
 Analice en `countdown_server.py` el uso de `gh.publish_feedback()`, `gh.is_cancel_requested`, `gh.canceled()` y `gh.succeed()`, y por qué se usa un `MultiThreadedExecutor`: mientras la meta se ejecuta, el servidor debe seguir atendiendo la petición de cancelación.
 
+Al terminar, detenga el servidor con Ctrl + C en la Terminal 1.
+
 ### Paso 4. Parámetros
 
-**Terminal (PC)**
+En la Terminal 1 lance el nodo con parámetros y déjela ejecutando.
+
+**Terminal 1 (PC) – déjela ejecutando**
 
 ```bash
 ros2 run jc_apps param_demo
+```
+
+En la Terminal 2 consulte y cambie sus parámetros:
+
+**Terminal 2 (PC)**
+
+```bash
 ros2 param list /param_demo
 ros2 param describe /param_demo velocidad
 # aceptado
@@ -226,9 +272,11 @@ ros2 param set /param_demo modo real
 ros2 param dump /param_demo > param_demo.yaml
 ```
 
+Al terminar, detenga el nodo con Ctrl + C en la Terminal 1.
+
 ### Paso 5. Crear su propio paquete
 
-**Terminal (PC)**
+**Terminal 1 (PC)**
 
 ```bash
 cd ~/robots_ws/src
@@ -277,7 +325,7 @@ def generate_launch_description():
     ])
 ```
 
-Agregue en `setup.py` la instalación de la carpeta `launch` (`('share/' + package_name + '/launch', glob('launch/*.py'))`), compile y ejecute `ros2 launch mi_celda demo.launch.py`.
+Agregue en `setup.py` la instalación de la carpeta `launch` (`('share/' + package_name + '/launch', glob('launch/*.py'))`), compile y ejecute ros2 launch mi\_celda demo.launch.py en la Terminal 1 (se detiene con Ctrl + C).
 
 ### Paso 7. TF2 con el modelo del robot
 
@@ -285,16 +333,18 @@ Este paso necesita el modelo del robot. Incorpore ahora `jc_description` (se est
 
 | **Paquete / carpeta** | **Para qué sirve** | **Qué contiene** | **Dónde se usa** |
 |---|---|---|---|
-| `src/jc_description` | Modelo del JetCobot (myCobot 280) en URDF/Xacro: eslabones, articulaciones, límites y pinza. Con él se publican las TF del brazo y se ve en RViz; lo usan MoveIt y Gazebo. | urdf/ jetcobot.urdf.xacro, jetcobot\_macro.xacro, jetcobot.ros2\_control.xacro y jetcobot.gazebo.xacro; config/ros2\_controllers.yaml; launch/display.launch.py; rviz/view.rviz. | PC (Parte A). En la Parte B también en la Jetson AGX Orin (DA-13). Se estudia a fondo en el DA-04. |
+| `src/jc_description` | Modelo del JetCobot de Yahboom en URDF/Xacro: eslabones, articulaciones, límites y pinza. Con él se publican las TF del brazo y se ve en RViz; lo usan MoveIt y Gazebo. | urdf/ jetcobot.urdf.xacro, jetcobot\_macro.xacro, jetcobot.ros2\_control.xacro y jetcobot.gazebo.xacro; config/ros2\_controllers.yaml; launch/display.launch.py; rviz/view.rviz; scripts/importar\_modelo\_yahboom.sh, que instala en meshes/yahboom/ las mallas 3D de Yahboom (no vienen en el repositorio). | PC (Parte A). En la Parte B también en la Jetson AGX Orin (DA-13). Se estudia a fondo en el DA-04. |
 
 Se agrega con estos comandos:
 
-**Terminal (PC)**
+**Terminal 1 (PC)**
 
 ```bash
 # trae lo nuevo del repositorio (correcciones y mejoras)
 cd ~/robots_ws && git pull
 cd ~/robots_ws && git sparse-checkout add src/jc_description
+# mallas 3D del JetCobot de Yahboom: se descargan aparte porque no están en el repositorio
+~/robots_ws/src/jc_description/scripts/importar_modelo_yahboom.sh --descargar
 # instala las dependencias de los paquetes agregados
 rosdep install --from-paths ~/robots_ws/src --ignore-src -r -y --skip-keys "mr_navigation jc_driver"
 cd ~/robots_ws
@@ -307,20 +357,36 @@ colcon test --packages-select jc_apps && colcon test-result --verbose
 >
 > 3 pruebas de `jc_apps` aprobadas (cinemática directa en cero y en `ready`, ida y vuelta FK→IK, yaw del TCP por simetría). El workspace tiene ahora `jc_interfaces`, `jc_apps`, `jc_description` y `mi_celda`.
 
-**Terminal (PC)**
+> **Nota:**
+>
+> jc\_description tiene dos formas de dibujar el robot con la misma cinemática: modelo:=yahboom, con las mallas STL de Yahboom, que se ve como el JetCobot real, y modelo:=simple, con cilindros y cajas, que no necesita archivos externos. Los lanzadores eligen solos: si encuentran las mallas instaladas usan yahboom; si no, simple, y lo avisan en la terminal. Si importar\_modelo\_yahboom.sh falla por falta de Internet, el resto del curso funciona igual con el modelo simple.
+
+En la Terminal 1 abra el modelo en RViz2 con los deslizadores de las articulaciones y déjela ejecutando:
+
+**Terminal 1 (PC) – déjela ejecutando**
 
 ```bash
-# RViz2 + sliders articulares
 ros2 launch jc_description display.launch.py
-# pose del TCP mientras mueve los sliders
+```
+
+Con la Terminal 1 ejecutando, abra la Terminal 2:
+
+**Terminal 2 (PC)**
+
+```bash
+# pose del TCP mientras mueve los deslizadores (Ctrl + C para salir)
 ros2 run tf2_ros tf2_echo world tcp
-# genera frames_<fecha>.pdf
+# genera frames_<fecha>.pdf con el árbol de marcos
 ros2 run tf2_tools view_frames
 ```
 
+> **Resultado esperado:**
+>
+> RViz2 muestra el JetCobot de Yahboom (base, eslabones, pinza y cámara) y se mueve con los deslizadores. Con todos los deslizadores en 0 (botón Center), tf2\_echo world tcp muestra Translation: [0.141, -0.065, 0.414]. Si el brazo se ve con cilindros y cajas, faltan las mallas: ejecute importar\_modelo\_yahboom.sh --descargar y vuelva a compilar.
+
 ![imagen](md_img/DA_03_Arquitectura_ROS2_04.jpg)
 
-*Figura 3. Árbol TF del JetCobot generado a partir del URDF de jc_description (verde: articulaciones de revolución; azul: prismáticas de la pinza; gris: fijas).*
+*Figura 3. Árbol TF del JetCobot generado a partir del URDF de jc_description con modelo:=yahboom (verde: articulaciones de revolución; azul: prismáticas de la pinza; gris: fijas; camera_body solo existe con las mallas de Yahboom).*
 
 ## 4. VERIFICACIÓN Y EVIDENCIAS
 
@@ -351,6 +417,8 @@ ros2 run tf2_tools view_frames
 | El suscriptor no recibe mensajes | QoS incompatible o dominio distinto | `ros2 topic info -v`; revisar `ROS_DOMAIN_ID` |
 | `ros2 action send_goal` queda esperando | Servidor no iniciado / nombre distinto | `ros2 action list -t` |
 | Cambios en Python no surten efecto | Compilación sin `--symlink-install` | Recompilar con `--symlink-install` |
+| El brazo se ve con cilindros y cajas en RViz2 | No están instaladas las mallas de Yahboom | ~/robots\_ws/src/jc\_description/scripts/importar\_modelo\_yahboom.sh --descargar; colcon build --symlink-install --packages-select jc\_description |
+| importar\_modelo\_yahboom.sh: curl: command not found o error de descarga | Falta curl o no hay Internet | sudo apt install -y curl y repetir; sin Internet se usa el modelo simple |
 
 ## REFERENCIAS
 

@@ -103,7 +103,7 @@ La cadena completa (TF del robot → modelo de cámara → segmentación → ecu
 
 Antes de empezar, traiga lo nuevo del repositorio robots\_ws y vuelva a compilar:
 
-**Terminal (PC)**
+**Terminal 1 (PC)**
 
 ```bash
 # trae lo nuevo del repositorio (correcciones y mejoras)
@@ -114,16 +114,35 @@ source install/setup.bash
 
 ### Paso 1. Detectores en simulación
 
-**Terminal (PC)**
+En la Terminal 1 lance la celda simulada (con GPU para la cámara) y déjela ejecutando:
+
+**Terminal 1 (PC) – déjela ejecutando**
 
 ```bash
-# Terminal 1: celda simulada (con GPU para la cámara)
 ros2 launch jc_bringup sim.launch.py
-# Terminal 2: llevar el robot a la pose de observación
+```
+
+En la Terminal 2 lleve el robot a la pose de observación:
+
+**Terminal 2 (PC)**
+
+```bash
 ros2 service call /jc/move_to_named jc_interfaces/srv/MoveToNamed "{name: observe}"
-# Terminal 3: detectores color/forma + ArUco
+```
+
+En la Terminal 3 lance los detectores de color y forma y de ArUco, y déjela ejecutando:
+
+**Terminal 3 (PC) – déjela ejecutando**
+
+```bash
 ros2 launch jc_vision vision.launch.py mode:=sim detector:=clasico
-# Terminal 4: inspección
+```
+
+En la Terminal 4 inspeccione las detecciones; las Terminales 1 y 3 se usan hasta el final del documento:
+
+**Terminal 4 (PC)**
+
+```bash
 ros2 topic echo /jc/detections --once
 ros2 run rqt_image_view rqt_image_view /jc/debug_image
 ```
@@ -140,13 +159,13 @@ En RViz2 agregue *MarkerArray* (`/jc/markers`) y *TF*: deben aparecer cubos de c
 
 ### Paso 2. Analizar el código del detector
 
-Revise en `jc_vision/detector_base.py` la secuencia: suscripción a `Image` y `CameraInfo` (QoS de sensores) → `detect()` → consulta TF `world ← camera_frame` → ecuación (1) → publicación. En `color_shape_detector.py` identifique `hsv_mask`, `find_blobs` y `classify_shape`. Las funciones geométricas (`geometry_utils.py`) tienen pruebas unitarias (`test_geometry_and_handeye.py`): ejecútelas con `colcon test --packages-select jc_vision`.
+Revise en `jc_vision/detector_base.py` la secuencia: suscripción a `Image` y `CameraInfo` (QoS de sensores) → `detect()` → consulta TF `world ← camera_frame` → ecuación (1) → publicación. En `color_shape_detector.py` identifique `hsv_mask`, `find_blobs` y `classify_shape`. Las funciones geométricas (`geometry_utils.py`) tienen pruebas unitarias (`test_geometry_and_handeye.py`): ejecútelas en la Terminal 4 con `colcon test --packages-select jc_vision`.
 
 ### Paso 3. Medición de exactitud y repetibilidad en Gazebo
 
 1. Elija 5 posiciones dentro de la zona alcanzable y visible desde `observe` (DA-05, Figura 1).
-1. En Gazebo, seleccione el cubo rojo (`pieza_roja`) y desplácelo con la herramienta **Translate** (tecla T) a la primera posición. Lea su posición verdadera con `ign model -m pieza_roja -p`.
-1. Registre 50 detecciones: `ros2 topic echo /jc/detections --field objects > rojo_P1.txt` (o un nodo propio).
+1. En Gazebo, seleccione el cubo rojo (`pieza_roja`) y desplácelo con la herramienta **Translate** (tecla T) a la primera posición. Lea su posición verdadera en la Terminal 4 con `ign model -m pieza_roja -p`.
+1. En la Terminal 4, registre 50 detecciones: `ros2 topic echo /jc/detections --field objects > rojo_P1.txt` (o un nodo propio).
 1. Calcule el error medio respecto a la posición verdadera (exactitud) y la desviación estándar (repetibilidad).
 1. Repita con el marcador ArUco (modelo `aruco_7`) y con el cilindro azul (`pieza_azul`), cuya cara superior está a 30 mm: compare su error con la ecuación (2).
 
@@ -166,7 +185,7 @@ Revise en `jc_vision/detector_base.py` la secuencia: suscripción a `Image` y `C
 
 ### Paso 4. Latencia
 
-Mida el retardo entre la captura y la publicación de detecciones comparando `header.stamp` de `/jc/detections` con el reloj al recibir (nodo propio de 15 líneas) o con `ros2 topic delay /jc/detections`. Reporte media y percentil 95.
+Mida el retardo entre la captura y la publicación de detecciones comparando `header.stamp` de `/jc/detections` con el reloj al recibir (nodo propio de 15 líneas) o, en la Terminal 4, con ros2 topic delay `/jc/detections`. Reporte media y percentil 95.
 
 ## 4. VERIFICACIÓN Y EVIDENCIAS
 

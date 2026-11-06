@@ -72,7 +72,7 @@ donde nₛ es el orden de simetría de la pieza (4 para el cubo). La validación
 
 Antes de empezar, traiga lo nuevo del repositorio robots\_ws y vuelva a compilar:
 
-**Terminal (PC)**
+**Terminal 1 (PC)**
 
 ```bash
 # trae lo nuevo del repositorio (correcciones y mejoras)
@@ -83,16 +83,35 @@ source install/setup.bash
 
 ### Paso 1. Integrar la celda en Gazebo
 
-**Terminal (PC)**
+En la Terminal 1 lance la celda simulada completa y déjela ejecutando:
+
+**Terminal 1 (PC) – déjela ejecutando**
 
 ```bash
-# Terminal 1: celda simulada completa
 ros2 launch jc_bringup sim.launch.py
-# Terminal 2: visión + pick & place (modo manual por acción)
+```
+
+En la Terminal 2 lance la visión y el pick and place (modo manual) y déjela ejecutando:
+
+**Terminal 2 (PC) – déjela ejecutando**
+
+```bash
 ros2 launch jc_apps celda.launch.py mode:=sim detector:=clasico
-# Terminal 3: ordenar una recogida
+```
+
+En la Terminal 3 ordene una recogida:
+
+**Terminal 3 (PC)**
+
+```bash
 ros2 action send_goal --feedback /jc/pick_place jc_interfaces/action/PickPlace "{label: rojo, use_place_pose: false}"
-# modo automático (clasifica todo lo que vea):
+```
+
+Modo automático (clasifica todo lo que vea): detenga la Terminal 2 con Ctrl + C y, en su lugar, lance:
+
+**Terminal 2 (PC) – variante automática**
+
+```bash
 ros2 launch jc_apps celda.launch.py mode:=sim detector:=clasico auto_sort:=true
 ```
 
@@ -127,7 +146,7 @@ Reubique las piezas en Gazebo (herramienta Translate) entre ciclos para que no s
 
 ### Paso 3. Línea base del tiempo de ciclo
 
-Grabe `ros2 bag record /jc/detections /joint_states /jc/pick_place/_action/feedback` durante 3 ciclos y obtenga la duración de cada etapa a partir de las marcas de tiempo de la realimentación (como en la Figura 3). La parametrización temporal TOTG de MoveIt ya minimiza el tiempo de cada trayectoria [4]; las palancas de optimización están en DA-17.
+En una Terminal 4, grabe `ros2 bag record /jc/detections /joint_states /jc/pick_place/_action/feedback` durante 3 ciclos y obtenga la duración de cada etapa a partir de las marcas de tiempo de la realimentación (como en la Figura 3). La parametrización temporal TOTG de MoveIt ya minimiza el tiempo de cada trayectoria [4]; las palancas de optimización están en DA-17.
 
 *Tabla 3. Línea base del tiempo de ciclo en simulación (diligenciar).*
 

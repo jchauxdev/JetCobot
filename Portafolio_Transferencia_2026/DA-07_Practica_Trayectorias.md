@@ -70,7 +70,7 @@ Los nodos de esta práctica solo usan la acción `/arm_controller/follow_joint_t
 
 Antes de empezar, traiga lo nuevo del repositorio robots\_ws y vuelva a compilar:
 
-**Terminal (PC)**
+**Terminal 1 (PC)**
 
 ```bash
 # trae lo nuevo del repositorio (correcciones y mejoras)
@@ -97,11 +97,20 @@ for k, wp in enumerate(WAYPOINTS_DEG, start=1):
 fut = self.cli.send_goal_async(goal, feedback_callback=self.on_fb)
 ```
 
-**Terminal (PC)**
+En la Terminal 1 lance la celda sin hardware (mock) y déjela ejecutando: los Pasos 1 a 4 la usan.
+
+**Terminal 1 (PC) – déjela ejecutando**
 
 ```bash
 # etapa 1
 ros2 launch jc_bringup mock.launch.py
+```
+
+Abra la Terminal 2 y envíe la trayectoria:
+
+**Terminal 2 (PC)**
+
+```bash
 ros2 run jc_apps trajectory_demo --ros-args -p segment_time:=2.5
 ```
 
@@ -128,7 +137,9 @@ for (size_t k = 0; k < wps_deg.size(); ++k) {
 auto gh_future = client->async_send_goal(goal, opts);
 ```
 
-**Terminal (PC)**
+Con la Terminal 1 ejecutando, en la Terminal 2:
+
+**Terminal 2 (PC)**
 
 ```bash
 ros2 run jc_motion trajectory_client --ros-args -p segment_time:=2.5
@@ -146,6 +157,8 @@ Cree en `mi_celda` (DA-03) un nodo Python `barrido.py` (registre el ejecutable `
 1. Genere una trayectoria de J1 entre ±amplitud alrededor de la configuración `ready` con 20 puntos por ciclo y velocidades analíticas (derivada de una senoide), dos ciclos.
 1. Verifique con (2) o con la derivada analítica que |q̇| &lt; 1,5 rad/s antes de enviar; si no, rechace y registre un error.
 1. Envíe la meta y reporte el error final articular medido en `/joint_states`.
+
+Edite el nodo, compílelo y ejecútelo en la Terminal 2 (cd ~/robots\_ws && colcon build --packages-select mi\_celda && source install/setup.bash, y luego ros2 run mi\_celda barrido), con la Terminal 1 todavía ejecutando mock.
 
 **Sugerencia de implementación**
 
@@ -177,7 +190,9 @@ mc.pose(0.21, -0.08, 0.14, cartesian=True)       # linea recta del TCP
 mc.gripper(0.0)                                  # cerrar
 ```
 
-**Terminal (PC)**
+Con la Terminal 1 ejecutando, pruebe en la Terminal 2:
+
+**Terminal 2 (PC)**
 
 ```bash
 ros2 run jc_apps square_demo --ros-args -p side:=0.04 -p z:=0.14
@@ -185,9 +200,9 @@ ros2 run jc_apps square_demo --ros-args -p side:=0.04 -p z:=0.14
 
 ### Paso 5. Etapa 2 completa en Gazebo y línea base para la Parte B
 
-1. Lance la celda simulada con física: `ros2 launch jc_bringup sim.launch.py`.
-1. Ejecute `trajectory_demo` con `segment_time:=4.0` y luego `square_demo` (agregue `use_sim_time:=true`).
-1. Registre: `ros2 bag record /joint_states /arm_controller/follow_joint_trajectory/_action/feedback`.
+1. Detenga mock con Ctrl + C en la Terminal 1 y, en esa misma terminal, lance la celda simulada con física y déjela ejecutando: `ros2 launch jc_bringup sim.launch.py`.
+1. En la Terminal 2 ejecute trajectory\_demo con `segment_time:=4.0` y luego `square_demo` (agregue `use_sim_time:=true`).
+1. Mientras corre el punto anterior, registre en una Terminal 3 (Ctrl + C al terminar): `ros2 bag record /joint_states /arm_controller/follow_joint_trajectory/_action/feedback`.
 1. Compare, para cada punto de paso, la posición comandada y la medida en Gazebo (Tabla 2). Esta tabla es la **línea base** con la que comparará el robot real en DA-15.
 
 > **INSERTAR IMAGEN / CAPTURA (por el instructor):**

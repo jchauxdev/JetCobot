@@ -64,16 +64,27 @@ source install/setup.bash
 
 ### Paso 1. Etapa 3: puente simulado en la Jetson
 
-**Terminal (Jetson, por SSH + tmux)**
+En la Terminal 1 entre a la Jetson por SSH (ssh usuario@IP\_JETSON y tmux new -A -s celda), lance la celda con el puente simulado y déjela ejecutando:
+
+**Terminal 1 (PC → Jetson por SSH + tmux) – déjela ejecutando**
 
 ```bash
 ros2 launch jc_bringup real.launch.py simulate:=true rviz:=false
 ```
 
-**Terminal (PC)**
+En la Terminal 2 del PC abra RViz2 y déjela ejecutando:
+
+**Terminal 2 (PC) – déjela ejecutando**
 
 ```bash
 ros2 launch jc_moveit_config rviz.launch.py
+```
+
+En la Terminal 3 del PC ejecute los programas uno a uno:
+
+**Terminal 3 (PC)**
+
+```bash
 ros2 run jc_apps trajectory_demo --ros-args -p segment_time:=2.5
 ros2 run jc_motion trajectory_client --ros-args -p segment_time:=2.5
 ros2 run jc_apps square_demo --ros-args -p side:=0.04 -p z:=0.14
@@ -87,17 +98,28 @@ ros2 run mi_celda barrido
 
 ### Paso 2. Etapa 4: robot real al 20 % de velocidad
 
-**Terminal (Jetson, por SSH + tmux)**
+En la Terminal 1 (Jetson) detenga la celda simulada con Ctrl + C y lance la celda con el robot real, con el robot energizado y la zona despejada:
+
+**Terminal 1 (PC → Jetson por SSH + tmux) – déjela ejecutando**
 
 ```bash
 # el servidor de movimiento usa escalado 0,2
 ros2 launch jc_bringup real.launch.py port:=/dev/ttyUSB0 rviz:=false
 ```
 
-**Terminal (PC)**
+En la Terminal 3 del PC grabe los datos de la prueba (Ctrl + C al terminar):
+
+**Terminal 3 (PC) – déjela ejecutando**
 
 ```bash
-ros2 bag record -o etapa4 /joint_states /arm_controller/follow_joint_trajectory/_action/feedback &
+ros2 bag record -o etapa4 /joint_states /arm_controller/follow_joint_trajectory/_action/feedback
+```
+
+En la Terminal 4 ejecute los programas; la Terminal 2 sigue con RViz2:
+
+**Terminal 4 (PC)**
+
+```bash
 ros2 run jc_apps trajectory_demo --ros-args -p segment_time:=4.0
 ros2 run jc_apps square_demo
 ```
@@ -126,7 +148,7 @@ Analice: ¿el error final cumple ≤ 2°? ¿el robot real llega antes o después
 
 ### Paso 4. Etapa 5: velocidad nominal y repetibilidad
 
-Aumente el escalado de velocidad a 0,5 como máximo (parámetro de `motion_server` o `velocity_scaling` en los servicios) y ejecute 5 veces `square_demo`. La parametrización temporal TOTG mantiene los límites de velocidad y aceleración [3].
+Aumente el escalado de velocidad a 0,5 como máximo (parámetro de `motion_server` o `velocity_scaling` en los servicios) y ejecute 5 veces square\_demo en la Terminal 4. La parametrización temporal TOTG mantiene los límites de velocidad y aceleración [3].
 
 *Tabla 3. Repetibilidad a velocidad nominal (diligenciar).*
 

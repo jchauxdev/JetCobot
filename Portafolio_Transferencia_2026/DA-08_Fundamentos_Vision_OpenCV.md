@@ -102,7 +102,7 @@ Estas prácticas no son paquetes de ROS 2: son scripts de Python que se ejecutan
 |---|---|---|---|
 | `practicas/dia2_vision` | Prácticas de visión con OpenCV sin ROS, para aprender adquisición, filtros, segmentación, características y calibración. No se compilan. | cv\_01\_adquisicion.py a cv\_04\_caracteristicas.py, calibrar\_camara.py, generar\_patrones.py y el módulo común comun.py. | PC con la cámara USB. |
 
-**Terminal (PC)**
+**Terminal 1 (PC)**
 
 ```bash
 # trae lo nuevo del repositorio (correcciones y mejoras)
@@ -112,7 +112,9 @@ cd ~/robots_ws && git sparse-checkout add practicas/dia2_vision
 
 ### Paso 1. Adquisición y desempeño
 
-**Terminal (PC)**
+Todo este documento se trabaja en una sola terminal, la Terminal 1, dentro de ~/robots\_ws/practicas/dia2\_vision, con la cámara USB conectada al PC. Cada script abre una ventana: ciérrela con q o Esc para volver a la terminal antes del siguiente comando.
+
+**Terminal 1 (PC)**
 
 ```bash
 cd ~/robots_ws/practicas/dia2_vision
@@ -134,7 +136,7 @@ Capture 5 imágenes de la mesa con las piezas (`s`), con la cámara a 20–25 cm
 
 ### Paso 2. Preprocesamiento
 
-**Terminal (PC)**
+**Terminal 1 (PC)**
 
 ```bash
 python3 cv_02_preprocesamiento.py --fuente captura_001.png
@@ -144,7 +146,7 @@ Ajuste los umbrales de Canny con las barras. Responda: ¿qué filtro preserva me
 
 ### Paso 3. Segmentación HSV y Otsu, y perfil para ROS
 
-**Terminal (PC)**
+**Terminal 1 (PC)**
 
 ```bash
 python3 cv_03_segmentacion.py --fuente /dev/video0 --nombre rojo
@@ -159,7 +161,7 @@ Repita para verde y azul y guarde los tres archivos `perfil_*.yaml`: en DA-09, a
 
 ### Paso 4. Características y clasificación de forma
 
-**Terminal (PC)**
+**Terminal 1 (PC)**
 
 ```bash
 # en vivo (contornos + ORB)

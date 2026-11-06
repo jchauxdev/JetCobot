@@ -113,7 +113,7 @@ $${e}_{i}=\left∥ {p}_{i}-\bar{p} \right∥,  {p}_{i}={\left[ {T}_{b←g}^{
 
 ### 2.5 Resultados de validación del procedimiento (simulación)
 
-El nodo se validó en simulación con una transformación verdadera conocida **t** = (36, 0, 20) mm (la del URDF), moviendo el robot automáticamente por varias poses (`tools/handeye_auto.py`). Tres corridas ilustran el efecto del protocolo de captura:
+El nodo se validó en simulación con una transformación verdadera conocida **t = (36, 0, 20) mm respecto a la brida**, moviendo el robot automáticamente por varias poses (`tools/handeye_auto.py`). Tres corridas ilustran el efecto del protocolo de captura:
 
 *Tabla 4. Efecto del protocolo de captura en la calibración mano-ojo (resultados medidos).*
 
@@ -129,6 +129,8 @@ El nodo se validó en simulación con una transformación verdadera conocida **t
 
 Lecciones: (i) con rotaciones pequeñas la componente a lo largo del eje óptico queda mal condicionada (error de 17 mm aunque la dispersión parezca baja: **dispersión baja no garantiza exactitud**); (ii) capturar con el robot aún en movimiento o con el marcador cerca del borde degrada todo; (iii) con un protocolo adecuado, PARK, HORAUD, TSAI y DANIILIDIS coinciden en ±3 mm. En la corrida 3 la rotación estimada difiere ≈ 2,7° de la verdadera.
 
+En la simulación del curso la cámara está en la posición nominal del JetCobot de Yahboom, t = (0, −34, 34) mm respecto a la brida (cam\_x, cam\_y y cam\_z de jc\_description): sus estimaciones deben acercarse a ese valor y las lecciones anteriores se aplican igual.
+
 ## 3. PROCEDIMIENTO PASO A PASO
 
 ### Paso 0. Incorporar al robots_ws el material de este documento
@@ -139,7 +141,7 @@ El espacio de trabajo `~/robots_ws` se construye a medida que avanza la transfer
 |---|---|---|---|
 | `src/jc_vision` | Visión de la celda en ROS 2: publica la imagen, detecta las piezas (color y forma, ArUco, YOLO) y calcula su posición respecto al robot con la calibración mano-ojo. | camera\_node, color\_shape\_detector, aruco\_detector, yolo\_detector y handeye\_calibration; geometry\_utils.py; config/ hsv\_profiles.yaml, camera\_info.yaml y handeye\_result.yaml; pruebas en test/. | PC (Parte A, con cámara USB o simulada). En la Parte B, la Jetson AGX Orin con la cámara conectada. |
 
-**Terminal (PC)**
+**Terminal 1 (PC)**
 
 ```bash
 # trae lo nuevo del repositorio (correcciones y mejoras)
@@ -162,7 +164,7 @@ ros2 pkg list | grep -E "jc_|mi_celda"
 
 Ejecute las pruebas unitarias del paquete antes de usarlo:
 
-**Terminal (PC)**
+**Terminal 1 (PC)**
 
 ```bash
 cd ~/robots_ws
@@ -177,10 +179,19 @@ Compare los rangos de partida de `~/robots_ws/src/jc_vision/config/hsv_profiles.
 
 ### Paso 1. Publicar la cámara en ROS 2
 
-**Terminal (PC)**
+Conecte la cámara USB al PC. En la Terminal 1 lance el nodo de la cámara y déjela ejecutando:
+
+**Terminal 1 (PC) – déjela ejecutando**
 
 ```bash
 ros2 run jc_vision camera_node --ros-args -p device:=/dev/video0 -p frame_id:=camera_optical_frame
+```
+
+Abra la Terminal 2 y compruebe la imagen (ros2 topic hz mide hasta Ctrl + C):
+
+**Terminal 2 (PC)**
+
+```bash
 ros2 topic hz /camera/image_raw
 ros2 topic echo /camera/camera_info --once
 ros2 run rqt_image_view rqt_image_view /camera/image_raw
@@ -192,7 +203,7 @@ Alternativa con un paquete mantenido por la comunidad: `ros2 run v4l2_camera v4l
 
 Genere e imprima el tablero (verifique con calibrador que cada cuadro mide 25,0 mm) y péguelo sobre una superficie rígida:
 
-**Terminal (PC)**
+**Terminal 2 (PC)**
 
 ```bash
 cd ~/robots_ws/practicas/dia2_vision
@@ -201,7 +212,9 @@ python3 generar_patrones.py --tablero 9x7 --cuadro_mm 25 --aruco 0-9 --lado_mm 3
 
 **Opción A** (script OpenCV del curso):
 
-**Terminal (PC)**
+Este script abre la cámara directamente: detenga antes el nodo de la Terminal 1 con Ctrl + C y ejecute en la Terminal 2, que ya está en la carpeta dia2\_vision:
+
+**Terminal 2 (PC)**
 
 ```bash
 python3 calibrar_camara.py capturar --fuente /dev/video0 --carpeta calib --esquinas 8x6
@@ -210,7 +223,9 @@ python3 calibrar_camara.py calibrar --carpeta calib --esquinas 8x6 --cuadro 0.02
 
 **Opción B** (herramienta estándar de ROS 2, `camera_calibration`) [5]:
 
-**Terminal (PC)**
+Esta herramienta lee la imagen de ROS 2: necesita el nodo de la cámara ejecutando en la Terminal 1 (Paso 1). En la Terminal 2:
+
+**Terminal 2 (PC)**
 
 ```bash
 ros2 run camera_calibration cameracalibrator --size 8x6 --square 0.025 \
@@ -234,15 +249,15 @@ Copie el resultado a `~/robots_ws/src/jc_vision/config/camera_info.yaml`, recomp
 
 En Gazebo la transformación verdadera entre la brida y la cámara es conocida (la del URDF), lo que permite medir el **error real** de cada método, algo imposible con el robot físico. El mundo `celda.sdf` incluye el marcador ArUco id 7 (DICT\_4X4\_50, 30 mm) fijo en la mesa.
 
-1. Lance la celda simulada con cámara (requiere GPU): `ros2 launch jc_bringup sim.launch.py`.
-1. Lance el nodo de calibración con los tópicos de la cámara simulada:`ros2 run jc_vision handeye_calibration --ros-args -p use_sim_time:=true -p image_topic:=/wrist_camera/image_raw -p camera_info_topic:=/wrist_camera/camera_info -p base_frame:=base_link -p gripper_frame:=link6_flange -p marker_length:=0.030 -p output_file:=$HOME/robots_ws/handeye_sim.yaml`
-1. Ejecute la captura automática: `python3 ~/robots_ws/tools/handeye_auto.py`. El programa lleva el robot por 14 poses que varían J4, J5 y J6, **espera 3 s** en cada una, captura una muestra y al final calcula con los 5 métodos.
-1. Obtenga la transformación verdadera del modelo: `ros2 run tf2_ros tf2_echo link6_flange camera_optical_frame` y complete la Tabla 6 con el error de cada método.
+1. Cierre la cámara USB (Ctrl + C en la Terminal 1, si sigue abierta). En la Terminal 1 lance la celda simulada con cámara (requiere GPU) y déjela ejecutando: `ros2 launch jc_bringup sim.launch.py`.
+1. En la Terminal 2 lance el nodo de calibración con los tópicos de la cámara simulada y déjela ejecutando: `ros2 run jc_vision handeye_calibration --ros-args -p use_sim_time:=true -p image_topic:=/wrist_camera/image_raw -p camera_info_topic:=/wrist_camera/camera_info -p base_frame:=base_link -p gripper_frame:=link6_flange -p marker_length:=0.030 -p output_file:=$HOME/robots_ws/handeye_sim.yaml`
+1. En la Terminal 3 ejecute la captura automática: `python3 ~/robots_ws/tools/handeye_auto.py`. El programa lleva el robot por 14 poses que varían J4, J5 y J6, **espera 3 s** en cada una, captura una muestra y al final calcula con los 5 métodos.
+1. En la Terminal 3, obtenga la transformación verdadera del modelo: `ros2 run tf2_ros tf2_echo link6_flange camera_optical_frame` y complete la Tabla 6 con el error de cada método.
 1. Experimento: edite la lista `POSES` de `handeye_auto.py` para usar solo rotaciones pequeñas (±10°) y repita. Compare con la corrida anterior y con la Tabla 4.
 
 > **Resultado esperado:**
 >
-> Archivo `handeye_sim.yaml` con `parent_frame: link6_flange`, `child_frame: camera_calibrated_optical`, traslación, cuaternión, método, número de muestras y dispersión. Valor verdadero: t = (36, 0, 20) mm. En la validación del material, PARK obtuvo un error de 2,4 mm con 11 muestras (corrida 3 de la Tabla 4).
+> Archivo `handeye_sim.yaml` con `parent_frame: link6_flange`, `child_frame: camera_calibrated_optical`, traslación, cuaternión, método, número de muestras y dispersión. Valor verdadero: t = (0, −34, 34) mm, la posición nominal de la cámara del JetCobot de Yahboom. En la validación del material, PARK obtuvo un error de 2,4 mm con 11 muestras (corrida 3 de la Tabla 4).
 
 *Tabla 6. Resultados de la calibración mano-ojo en simulación (diligenciar).*
 
